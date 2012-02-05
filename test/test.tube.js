@@ -128,19 +128,30 @@ describe('Tube', function () {
       //   });
       // });
       
-      // it('when the query was successful, the tube contains feed entries', function (data) {
-      //   tube.load(function () {
-      //     this.length.be.above(0);
-      //     done();
-      //   });        
-      // });
+      describe('when the query was successful', function () {
+        before(function () {
+          tube.options.query = 'foobar';
+        });
+        
+        after(function () {
+          tube.options.query = null;
+        });
+        
+        // it('the tube contains feed entries', function (data) {
+        //   tube.load(function () {
+        //     this.videos.should.not.be.empty;
+        //     done();
+        //   });
+        // });
       
-      // it('when the query was successful, the callback is called with a status true', function (data) {
-      //   tube.load(function (status) {
-      //     status.should.be(true);
-      //     done();
-      //   });        
-      // });
+        // it('the callback is called with a status: true', function (data) {
+        //   tube.load(function (status) {
+        //     status.should.be(true);
+        //     done();
+        //   });
+        // });
+      });
+
     });
   });
   
