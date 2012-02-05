@@ -60,6 +60,25 @@ describe('Tube', function () {
       });
       
     });
+  });
+  
+  describe('instance methods', function () {
+    var tube;
+
+    beforeEach(function () {
+      tube = new Tube();
+    });
+    
+    describe('#parameters', function () {
+      it('returns the default options by default', function () {
+        var parameters = tube.parameters();
+        
+        parameters.should.have.property('format');
+        parameters.should.have.property('orderby');
+        parameters.should.have.property('alt');
+        parameters.should.have.property('callback', '?');
+      });
+    });
     
   });
   

@@ -38,7 +38,7 @@ if (!String.prototype.supplant) {
   /** Tube Constructor */
   
   var Tube = function (options) {
-    this.options = options;
+    this.options = $.extend({}, $.tube.defaults, options);
   };
   
 
@@ -98,7 +98,7 @@ if (!String.prototype.supplant) {
     var parameters = {};
     options = $.extend(options || {}, this.options);
     
-    $.each($.tube.constants.gdata.map, function (value, key) {
+    $.each($.tube.constants.gdata.map, function (key, value) {
       if (options[value]) {
         parameters[key] = options[value];
       }
@@ -158,11 +158,10 @@ if (!String.prototype.supplant) {
     if (this.length) {
       
       if (typeof args === 'string') {
-        options = $.tube.defaults;
-        options.query = args;
+        options = { query: args };
       }
       else {
-        options = $.extend({}, $.tube.defaults, options);
+        options = args;
       }
       
       playlist = new Tube(options);
