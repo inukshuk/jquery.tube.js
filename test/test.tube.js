@@ -51,29 +51,11 @@ describe('Tube', function () {
 
       it('filters empty values', function () {
         Tube.serialize({ foo: '' }).should.equal('');
-        Tube.serialize({ foo: '', bar: 'bar' }).should.equal('bar=bar');
+        Tube.serialize({ foo: '', bar: 'bar', x: undefined }).should.equal('bar=bar');
       });
       
     });
     
-    describe('when an API key is present', function () {
-      var key = $.tube.constants.key;
-      
-      beforeEach(function () {
-        $.tube.constants.key = 'THEKEY';
-      });
-      
-      afterEach(function () {
-        $.tube.constants.key = key;
-      });
-      
-      it('adds the key to the list of parameters', function () {
-        Tube.serialize().should.equal('key=THEKEY');
-        Tube.serialize('xy').should.equal('xy&key=THEKEY');
-      });
-
-      
-    });
   });
   
 });

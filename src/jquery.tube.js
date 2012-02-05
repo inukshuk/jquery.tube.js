@@ -44,7 +44,7 @@ if (!String.prototype.supplant) {
   /** Static Tube Functions */
   
   /*
-   * Encodes a set of parameters and adds an API key (if available).
+   * Encodes a set of parameters.
    * Returns the encoded parameters as a string.
    */
   Tube.serialize = function (parameters) {
@@ -61,7 +61,9 @@ if (!String.prototype.supplant) {
         }
         else {
           string = $.map(parameters, function (value, key) {
-            return [encodeURI(key), encodeURI(value)].join('=');
+            if (value) {
+              return [encodeURI(key), encodeURI(value)].join('=');
+            }
           }).join('&');
         }
         break;
@@ -69,11 +71,6 @@ if (!String.prototype.supplant) {
       default:
         string = '';
         break;
-    }
-            
-    if ($.tube.constants.key) {
-      var key = ['key', $.tube.constants.key].join('=');
-      string += (string.length) ? ('&' + key) : key;
     }
     
     return string;
@@ -86,12 +83,8 @@ if (!String.prototype.supplant) {
   Tube.prototype.load = function (query) {
     var self = this;
     
-    var parameters = {
-      q: (query || self.options.query),
-      alt: 'json-in-script',
-      
-    }
-      'q=' + 
+    var parameters = [
+      'q=' + (query || self.options.query),
       'alt=json-in-script',
       'max-results=' + self.options.limit,
       'orderby=' + self.options.order,
@@ -173,15 +166,15 @@ if (!String.prototype.supplant) {
 
   $.tube.constants = {
     gdata: 'http://gdata.youtube.com/feeds/api/videos',
-    api: 'http://www.youtube.com/player_api',
-    key: ''
+    api: 'http://www.youtube.com/player_api'
   };
   
   $.tube.defaults = {
     player: '#player',
     order: 'published',
     format: 5,
-    limit: false
+    limit: false,
+    key: false
   };
   
   window.onYouTubePlayerAPIReady = function () {
