@@ -1,4 +1,4 @@
 test:
-	mocha --require should --reporter dot
+	mocha --require should --require jsdom --require jquery --reporter dot test/runner.js
 
 .PHONY: test

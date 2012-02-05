@@ -21,35 +21,90 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
-;(function ($, window, document, version, undefined) {
-  "use strict";
-  
+/** String Supplant from Douglas Crockford's Remedial JavaScript */
+if (!String.prototype.supplant) {
+ String.prototype.supplant = function (o) {
+   return this.replace(/\{([^{}]*)\}/g, function (a, b) {
+     var r = o[b];
+     return typeof r === 'string' || typeof r === 'number' ? r : a;
+   });
+ };
+}
 
-  var Playlist = function (options) {
+(function ($, window, document, version, undefined) {
+  "use strict";  
+
+  /** Tube Constructor */
+  
+  var Tube = function (options) {
     this.options = options;
   };
   
-	Playlist.prototype.load = function (query) {
-		var self = this;
-		
-		var parameters = [
-			'q=' + (query || self.options.query),
-			'alt=json-in-script',
-			'max-results=' + self.options.limit,
-			'orderby=' + self.options.order,
-			'format=' + self.options.format,
-			'callback=?'
-		];
-		
-		var request = $.tube.constants.gdata + '?';
-		request += parameters.join('&');
-		
-		$.getJSON(request, function (data) {
-			console.log(data);
-		});
-	};
-	
-	
+
+  /** Static Tube Functions */
+  
+  /*
+   * Encodes a set of parameters and adds an API key (if available).
+   * Returns the encoded parameters as a string.
+   */
+  Tube.serialize = function (parameters) {
+    var string;
+    
+    switch (typeof parameters) {
+      case 'string':
+        string = encodeURI(parameters);
+        break;
+        
+      case 'object':
+        if (parameters === null) {
+          string = '';
+        }
+        else {
+          string = $.map(parameters, function (value, key) {
+            return [encodeURI(key), encodeURI(value)].join('=');
+          }).join('&');
+        }
+        break;
+        
+      default:
+        string = '';
+        break;
+    }
+            
+    if ($.tube.constants.key) {
+      var key = ['key', $.tube.constants.key].join('=');
+      string += (string.length) ? ('&' + key) : key;
+    }
+    
+    return string;
+  };
+
+  
+  /** Tube Methods */
+  
+  Tube.prototype.load = function (query) {
+    var self = this;
+    
+    var parameters = [
+      'q=' + (query || self.options.query),
+      'alt=json-in-script',
+      'max-results=' + self.options.limit,
+      'orderby=' + self.options.order,
+      'format=' + self.options.format,
+      'callback=?'
+    ];
+    
+    var request = $.tube.constants.gdata + '?';
+    request += parameters.join('&');
+    
+    $.getJSON(request, function (data) {
+      console.log(data);
+    });
+  };
+  
+  
+  /** Player Constructor */
+  
   var Player = function (options) {
     this.options = options;   
   };
@@ -97,8 +152,8 @@
         options = $.extend({}, $.tube.defaults, options);
       }
       
-      playlist = new Playlist(options);
-			playlist.load();
+      playlist = new Tube(options);
+      playlist.load();
     }
     
     return this;
@@ -113,7 +168,8 @@
 
   $.tube.constants = {
     gdata: 'http://gdata.youtube.com/feeds/api/videos',
-    api: 'http://www.youtube.com/player_api'
+    api: 'http://www.youtube.com/player_api',
+    key: ''
   };
   
   $.tube.defaults = {
@@ -125,7 +181,11 @@
   
   window.onYouTubePlayerAPIReady = function () {
     Player.ready = true;
-		console.log('player API loaded');
+    console.log('player API loaded');
   };
 
-}(jQuery, this, this.document, '0.1'));
+  // export classes for testing
+  $.tube.Tube = Tube;
+  $.tube.Player = Player;
+  
+}(jQuery, window, window.document, '0.1'));
