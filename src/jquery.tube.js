@@ -34,6 +34,7 @@ if (!String.prototype.supplant) {
 (function ($, window, document, version, undefined) {
   "use strict";  
 
+  
   /** Tube Constructor */
   
   var Tube = function (options) {
@@ -80,24 +81,38 @@ if (!String.prototype.supplant) {
   /** Tube Methods */
   
 
+  /*
+   * Populates the tube object with data from YouTube.
+   * Returns the tube object (non-blocking).
+   */
   Tube.prototype.load = function (query) {
     var self = this;
-    
-    var parameters = [
-      'q=' + (query || self.options.query),
-      'alt=json-in-script',
-      'max-results=' + self.options.limit,
-      'orderby=' + self.options.order,
-      'format=' + self.options.format,
-      'callback=?'
-    ];
-    
-    var request = $.tube.constants.gdata + '?';
-    request += parameters.join('&');
-    
-    $.getJSON(request, function (data) {
+      
+    $.getJSON(this.request(), function (data) {
       console.log(data);
     });
+  };
+  
+  /** Returns the tube's gdata parameters as a hash */
+  Tube.prototype.parameters = function (options) {
+    var parameters = {};
+    options = $.extend(options || {}, this.options);
+    
+    $.each($.tube.constants.gdata.map, function (value, key) {
+      if (options[value]) {
+        parameters[key] = options[value];
+      }
+    });
+    
+    parameters.alt      = 'json-in-script';
+    parameters.callback = '?';
+
+    return parameters;
+  };
+  
+  /** Returns the tube's gdata request string */
+  Tube.prototype.request = function (options) {
+    return [$.tube.constants.gdata.api, '?', Tube.serialize(this.parameters(options))].join();
   };
   
   
@@ -165,8 +180,19 @@ if (!String.prototype.supplant) {
   
 
   $.tube.constants = {
-    gdata: 'http://gdata.youtube.com/feeds/api/videos',
-    api: 'http://www.youtube.com/player_api'
+    gdata: {
+      api: 'http://gdata.youtube.com/feeds/api/videos',
+      map: {
+        'q': 'query',
+        'max-results': 'limit',
+        'key': 'key',
+        'format': 'format',
+        'orderby': 'order'
+      }
+    },
+    player: {
+      api: 'http://www.youtube.com/player_api'
+    }
   };
   
   $.tube.defaults = {

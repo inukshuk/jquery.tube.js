@@ -2,7 +2,12 @@ describe('Tube', function () {
   var Tube = $.tube.Tube;
   
   describe('Constructor', function () {
-    
+    it('returns a tube object', function () {
+      var tube = new Tube();
+      
+      // this is rather permissive; just a few important properties
+      tube.should.haveOwnProperty('options');
+    });
   });
   
   describe('.serialize', function () {
