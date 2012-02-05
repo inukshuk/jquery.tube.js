@@ -1,0 +1,4 @@
+--require should
+--require jsdom
+--require jquery
+--reporter dot

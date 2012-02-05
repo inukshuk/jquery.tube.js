@@ -100,8 +100,18 @@ describe('Tube', function () {
     });
     
     describe('#request', function () {
+      it('returns a string', function () {
+        tube.request().should.be.a('string');
+      });
+      
       it('returns an http url with options', function () {
         tube.request().should.match(/^https?:[^\s]+\/?[\w\d%&?=\-]+$/);
+      });
+    });
+    
+    describe('#load', function () {
+      it('returns the tube object (without blocking)', function () {
+        tube.load().should.equal(tube);
       });
     });
   });

@@ -91,6 +91,8 @@ if (!String.prototype.supplant) {
     $.getJSON(this.request(), function (data) {
       console.log(data);
     });
+    
+    return this;
   };
   
   /** Returns the tube's gdata parameters as a hash */

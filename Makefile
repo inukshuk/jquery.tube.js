@@ -1,7 +1,7 @@
 test:
-	mocha --require should --require jsdom --require jquery --reporter dot test/runner.js
+	mocha test/runner.js
 
 spec:
-	mocha --require should --require jsdom --require jquery --reporter spec test/runner.js
+	mocha -R spec test/runner.js
 
 .PHONY: test spec
