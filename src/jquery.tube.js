@@ -82,11 +82,16 @@ if (!String.prototype.supplant) {
   
   /** Tube Methods */
   
+
   Tube.prototype.load = function (query) {
     var self = this;
     
-    var parameters = [
-      'q=' + (query || self.options.query),
+    var parameters = {
+      q: (query || self.options.query),
+      alt: 'json-in-script',
+      
+    }
+      'q=' + 
       'alt=json-in-script',
       'max-results=' + self.options.limit,
       'orderby=' + self.options.order,

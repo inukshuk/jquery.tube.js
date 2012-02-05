@@ -44,6 +44,16 @@ describe('Tube', function () {
         Tube.serialize({ foo: 'bar', bar: 'foo bar'}).should.equal('foo=bar&bar=foo%20bar');
       });
       
+      it('filters null values', function () {
+        Tube.serialize({ foo: null }).should.equal('');
+        Tube.serialize({ foo: null, bar: 'bar' }).should.equal('bar=bar');
+      });
+
+      it('filters empty values', function () {
+        Tube.serialize({ foo: '' }).should.equal('');
+        Tube.serialize({ foo: '', bar: 'bar' }).should.equal('bar=bar');
+      });
+      
     });
     
     describe('when an API key is present', function () {
