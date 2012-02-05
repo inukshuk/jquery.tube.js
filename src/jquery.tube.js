@@ -90,20 +90,19 @@ if (!String.prototype.supplant) {
    * Returns the tube object (non-blocking).
    */
   Tube.prototype.load = function (callback) {
-    var self = this;
-      console.log('thoems loading2...' + this.request());
+      var self = this;
       $.getJSON(this.request(), function (data) {
-	  $.each(data.feed.entry, function(ii, item) {
-	      this.videos[ii] = new Array();
-	      this.videos[ii].title = item['title']['$t'];
-	      var video = item['id']['$t'];
-	      this.videos[ii].description = item['media$group']['media$description']['$t'];
-	      this.videos[ii].videoId = video.replace('http://gdata.youtube.com/feeds/api/videos/','');  //extracting the videoID
-	      this.videos[ii].thumb = "http://img.youtube.com/vi/"+ videoId +"/default.jpg";
-	      console.log(ii + '\ntitle: ' + this.videos[ii].title + '\nvideoID: ' + this.videos[ii].videoId + '\ndescription: ' + this.videos[ii].description + '\n');
-	  });
 	  if (callback && $.isFunction(callback)) {
-              callback.apply(self,data);
+	      $.each(data.feed.entry, function(ii, item) {
+		  self.videos[ii] = {};
+		  self.videos[ii].title = item['title']['$t'];
+		  self.videos[ii].description = item['media$group']['media$description']['$t'];
+		  var video = item['id']['$t'];
+		  self.videos[ii].videoId = video.replace('http://gdata.youtube.com/feeds/api/videos/','');  //extracting the videoID
+		  self.videos[ii].thumb = "http://img.youtube.com/vi/{videoId}/default.jpg".supplant({videoId: self.videos[ii].videoId});
+	      });
+	  
+              callback.apply(self);
 	  }
       });
       
