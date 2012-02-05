@@ -72,14 +72,36 @@ describe('Tube', function () {
     describe('#parameters', function () {
       it('returns the default options by default', function () {
         var parameters = tube.parameters();
+
+        parameters.should.not.have.property('key');
         
         parameters.should.have.property('format');
         parameters.should.have.property('orderby');
         parameters.should.have.property('alt');
         parameters.should.have.property('callback', '?');
       });
+      
+      it('includes the key if set in the options', function () {
+        tube.options.key = 'THEKEY';
+        tube.parameters().should.have.property('key', 'THEKEY');
+      });
+      
+      it("passed in values override the tube's options", function () {
+        tube.parameters({ format: 'OVERRIDE' }).format.should.not.equal(tube.parameters.format);
+      });
+
+      it('the callback parameter is never overridden', function () {
+        tube.parameters({ callback: 'OVERRIDE' }).should.have.property('callback', '?');
+      });
+      
+      it('unknown parameter options are ignored', function () {
+        tube.parameters({ foo: 'bar' }).should.not.have.property('foo');
+      });
     });
     
+    describe('#request', function () {
+      // it('returns');
+    });
   });
   
 });
