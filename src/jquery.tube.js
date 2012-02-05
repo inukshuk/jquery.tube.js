@@ -38,6 +38,7 @@ if (!String.prototype.supplant) {
   /** Tube Constructor */
   
   var Tube = function (options) {
+    this.videos = [];
     this.options = $.extend({}, $.tube.defaults, options);
   };
   
@@ -90,14 +91,23 @@ if (!String.prototype.supplant) {
    */
   Tube.prototype.load = function (callback) {
     var self = this;
-    
-    $.getJSON(this.request(), function (data) {
-      if (callback && $.isFunction(callback)) {
-        callback.apply(self);
-      }
-    });
-    
-    return this;
+      console.log('thoems loading2...' + this.request());
+      $.getJSON(this.request(), function (data) {
+	  $.each(data.feed.entry, function(ii, item) {
+	      this.videos[ii] = new Array();
+	      this.videos[ii].title = item['title']['$t'];
+	      var video = item['id']['$t'];
+	      this.videos[ii].description = item['media$group']['media$description']['$t'];
+	      this.videos[ii].videoId = video.replace('http://gdata.youtube.com/feeds/api/videos/','');  //extracting the videoID
+	      this.videos[ii].thumb = "http://img.youtube.com/vi/"+ videoId +"/default.jpg";
+	      console.log(ii + '\ntitle: ' + this.videos[ii].title + '\nvideoID: ' + this.videos[ii].videoId + '\ndescription: ' + this.videos[ii].description + '\n');
+	  });
+	  if (callback && $.isFunction(callback)) {
+              callback.apply(self,data);
+	  }
+      });
+      
+      return this;
   };
   
   /** Returns the tube's gdata parameters as a hash */
