@@ -82,14 +82,19 @@ if (!String.prototype.supplant) {
   
 
   /*
-   * Populates the tube object with data from YouTube.
+   * Populates the tube object with data from YouTube. If function is passed
+   * as an argument to this method, it will be called when the AJAX request
+   * returns. The callback will be applied to the tube object.
+   * 
    * Returns the tube object (non-blocking).
    */
-  Tube.prototype.load = function (query) {
+  Tube.prototype.load = function (callback) {
     var self = this;
-      
+    
     $.getJSON(this.request(), function (data) {
-      console.log(data);
+      if (callback && $.isFunction(callback)) {
+        callback.apply(self);
+      }
     });
     
     return this;

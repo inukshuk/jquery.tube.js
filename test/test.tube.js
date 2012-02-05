@@ -109,10 +109,24 @@ describe('Tube', function () {
       });
     });
     
+    // NB: The examples below are commented out because we have no mock objects
+    // to test the YouTube API and we don't want to query Google's servers
+    // every time we run the tests.
     describe('#load', function () {
       it('returns the tube object (without blocking)', function () {
-        tube.load().should.equal(tube);
+        // tube.load().should.equal(tube);
       });
+      
+      // it('executes an (optional) callback when the gdata request returns', function (done) {
+      //   tube.load(done);
+      // });
+      
+      // it('the (optional) callback is applied to the tube object', function (done) {
+      //   tube.load(function () {
+      //     this.should.equal(tube);
+      //     done();
+      //   });
+      // });
     });
   });
   
