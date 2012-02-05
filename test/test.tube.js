@@ -127,6 +127,20 @@ describe('Tube', function () {
       //     done();
       //   });
       // });
+      
+      // it('when the query was successful, the tube contains feed entries', function (data) {
+      //   tube.load(function () {
+      //     this.length.be.above(0);
+      //     done();
+      //   });        
+      // });
+      
+      // it('when the query was successful, the callback is called with a status true', function (data) {
+      //   tube.load(function (status) {
+      //     status.should.be(true);
+      //     done();
+      //   });        
+      // });
     });
   });
   
