@@ -90,17 +90,19 @@ describe('Tube', function () {
         tube.parameters({ format: 'OVERRIDE' }).format.should.not.equal(tube.parameters.format);
       });
 
-      it('the callback parameter is never overridden', function () {
+      it('never overrides the callback parameter', function () {
         tube.parameters({ callback: 'OVERRIDE' }).should.have.property('callback', '?');
       });
       
-      it('unknown parameter options are ignored', function () {
+      it('ignores unknown parameter options', function () {
         tube.parameters({ foo: 'bar' }).should.not.have.property('foo');
       });
     });
     
     describe('#request', function () {
-      // it('returns');
+      it('returns an http url with options', function () {
+        tube.request().should.match(/^https?:[^\s]+\/?[\w\d%&?=\-]+$/);
+      });
     });
   });
   

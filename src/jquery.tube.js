@@ -112,7 +112,7 @@ if (!String.prototype.supplant) {
   
   /** Returns the tube's gdata request string */
   Tube.prototype.request = function (options) {
-    return [$.tube.constants.gdata.api, '?', Tube.serialize(this.parameters(options))].join();
+    return [$.tube.constants.gdata.api, '?', Tube.serialize(this.parameters(options))].join('');
   };
   
   
