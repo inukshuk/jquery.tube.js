@@ -84,13 +84,9 @@ Tube.prototype.load = function (callback) {
 
     $.getJSON(this.request(), function (data) {
       success = data.feed.entry.length;
+
       self.videos = $.map(data.feed.entry, function(item) {
-        return {
-          title: item.title.$t,
-          description: item.media$group.media$description.$t,
-          id: item.id.$t.replace('http://gdata.youtube.com/feeds/api/videos/','')
-        };
-        
+        return new Video().parse(item);
       });
 
       if (callback && $.isFunction(callback)) {  
@@ -135,7 +131,7 @@ Tube.prototype.request = function (options) {
 };
 
 Tube.prototype.authenticate = function () {
-  
+  return this;
 };
 
 /** Returns the video as an HTML string */
