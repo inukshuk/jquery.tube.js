@@ -1,5 +1,5 @@
+
 describe('Tube', function () {
-  var Tube = $.tube.Tube;
   
   describe('Constructor', function () {
     it('returns a tube object', function () {

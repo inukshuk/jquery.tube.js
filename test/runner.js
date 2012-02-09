@@ -1,7 +1,9 @@
 window = require('jsdom').jsdom().createWindow();
 jQuery = $ = require('jquery');
 
-require('../src/jquery.tube.js');
+Tube = require('../src/tube.js').Tube;
+Player = require('../src/player.js').Player;
+require('../src/plugin.js');
 
 require('./test.tube.js');
 require('./test.player.js');
