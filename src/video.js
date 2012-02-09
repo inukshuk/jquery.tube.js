@@ -23,15 +23,15 @@ Video.templates = {
 	video: '{title}{thumbnail}{description}<p>{author} – {statistics}</p></div>'
 };
 
-/** Private Functions */
 
+/** Private Functions */
 
 var pad = function (number) {
 	return ('0' + number).slice(-2);
 };
 
 
-/** Instance Methods */
+/** Video Instance Methods */
 
 /** Parses a YouTube JSON element */
 Video.prototype.parse = function (json) {

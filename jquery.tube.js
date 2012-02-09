@@ -24,6 +24,81 @@
 (function ($, window, document, version, undefined) {
   'use strict';
  
+ /** String Supplant from Douglas Crockford's Remedial JavaScript */
+ if (!String.prototype.supplant) {
+  String.prototype.supplant = function (o) {
+    return this.replace(/\{([^{}]*)\}/g, function (a, b) {
+      var r = o[b];
+      return typeof r === 'string' || typeof r === 'number' ? r : a;
+    });
+  };
+ }
+ 
+ /** Array Remove - By John Resig (MIT Licensed) */
+ Array.prototype.remove = function(from, to) {
+   var rest = this.slice((to || from) + 1 || this.length);
+   this.length = from < 0 ? this.length + from : from;
+   return this.push.apply(this, rest);
+ };
+ 
+ 
+ /** A Simple Observer Pattern Implementation */
+ 
+ 
+ var observable = function () {
+  
+  this.on = function (event, callback) {
+   this.observers = this.observers || {};
+   this.observers[event] = this.observers || [];
+  
+   if ($.isFunction(callback)) {
+    this.observers[event].push(callback);   
+   }
+  
+   return this;
+  };
+  
+  this.off = function (event, callback) {
+   if (this.observers && this.observers[event]) {
+    var i, observers = this.observers[event], matches = [];
+   
+    if (callback) {
+     for (i = 0; i < observers.length; ++i) {
+      if (observers[i] === callback) {
+       matches.push(i);
+      }
+     }
+    
+     for (i = 0; i < matches; ++i) {
+      observers.remove(i);
+     }
+    
+    }
+    else {
+     // remove all observers for the event
+     this.observers[event] = [];
+    }   
+   }
+  
+   return this;
+  };
+  
+  this.notify = function (event) {
+   if (this.observers && this.observers[event]) {
+    $.each(this.observers[event], function () {
+     if ($.isFunction(this)) {
+      this.call(event);
+     }
+    });
+   }
+  
+   return this;
+  };
+  
+  return this;
+ };
+ 
+ 
  /** Video Constructor */
  
  var Video = function (properties) {
@@ -48,15 +123,15 @@
   video: '{title}{thumbnail}{description}<p>{author} – {statistics}</p></div>'
  };
  
- /** Private Functions */
  
+ /** Private Functions */
  
  var pad = function (number) {
   return ('0' + number).slice(-2);
  };
  
  
- /** Instance Methods */
+ /** Video Instance Methods */
  
  /** Parses a YouTube JSON element */
  Video.prototype.parse = function (json) {
@@ -148,15 +223,18 @@
  var Tube = function (options) {
    this.videos = [];
    this.options = $.extend({}, Tube.defaults, options);
+  this.current = 0;
+  this.player = null;
  };
  
+ // mixin observable
+ observable.apply(Tube.prototype);
  
  Tube.constants = {
    api: '//gdata.youtube.com/feeds/api/' 
  };
  
  Tube.defaults = {
-   player: '#player',
    order: 'relevance', // 'published', 'rating', 'viewCount'
    author: false,
    version: 2,
@@ -211,8 +289,8 @@
  };
  
  
- /** Tube Methods */
  
+ /** Tube Instance Methods */
  
  /*
   * Populates the tube object with data from YouTube. If function is passed
@@ -278,6 +356,48 @@
    return this;
  };
  
+ /*
+  * Plays the video at the given index in the associated player.
+  * If no index is given, plays the next video.
+  */
+ Tube.prototype.play = function (index) {
+  var k =  index % this.videos.length; 
+  this.current = (k < 0) ? this.videos.length - k : k;
+ 
+  if (this.player && this.videos.length) {
+   this.player.play(this.videos[this.current]);
+  }
+  
+  return this;
+ };
+ 
+ /** Pauses playback of the current player */
+ Tube.prototype.pause = function (index) {
+ 
+  if (this.player) {
+   this.player.pause();
+  }
+  
+  return this;
+ };
+ Tube.prototype.stop = Tube.prototype.pause;
+ 
+ /** Plays the next video. */
+ Tube.prototype.next = function () {
+  return this.advance(1);
+ };
+ 
+ /** Plays the previous video. */
+ Tube.prototype.previous = function () {
+  return this.advance(-1);
+ };
+ 
+ Tube.prototype.advance = function (by) { 
+  return this.play(this.current + by || 1);
+ };
+ 
+ 
+ 
  /** Returns the video as an HTML string */
  Tube.prototype.html = function () {
   var elements = $.map(this.videos, function (video) {
@@ -290,7 +410,8 @@
  /** Player Constructor */
  
  var Player = function (options) {
-   this.options = options;   
+   this.options = options;
+  this.observers = [];
  };
  
  Player.ready = false;
@@ -312,16 +433,18 @@
    return false;
  };
  
+ Player.prototype.play = function (video) {
+  
+ };
  
- /** String Supplant from Douglas Crockford's Remedial JavaScript */
- if (!String.prototype.supplant) {
-  String.prototype.supplant = function (o) {
-    return this.replace(/\{([^{}]*)\}/g, function (a, b) {
-      var r = o[b];
-      return typeof r === 'string' || typeof r === 'number' ? r : a;
-    });
-  };
- }
+ Player.prototype.pause = function () {
+  
+ };
+ 
+ Player.prototype.stop = Player.prototype.pause;
+ 
+ 
+ 
  
  // methods exposed by jquery function plugin
  var methods = {

@@ -1,7 +1,8 @@
 /** Player Constructor */
 
 var Player = function (options) {
-  this.options = options;   
+  this.options = options;
+	this.observers = [];
 };
 
 Player.ready = false;
@@ -22,6 +23,18 @@ Player.load = function (callback) {
   
   return false;
 };
+
+Player.prototype.play = function (video) {
+	
+};
+
+Player.prototype.pause = function () {
+	
+};
+
+Player.prototype.stop = Player.prototype.pause;
+
+
 
 if (exports) {
 	exports.Player = Player;
