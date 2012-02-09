@@ -13,11 +13,11 @@ Tube.constants = {
 
 Tube.defaults = {
   player: '#player',
-  order: 'published',
+  order: 'relevance', // 'published', 'rating', 'viewCount'
   author: false,
   version: 2,
   format: 5,
-  limit: false,
+  limit: 10,
   key: false  
 };
 
@@ -139,7 +139,7 @@ Tube.prototype.html = function () {
 	var elements = $.map(this.videos, function (video) {
 		return '<li>' + video.html() + '</li>';
 	});
-	return '<ul>' + elements.join('') + '</ul>';
+	return '<ol>' + elements.join('') + '</ol>';
 };
 
 

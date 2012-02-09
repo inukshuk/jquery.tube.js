@@ -29,10 +29,10 @@ $.fn.tube = function (args) {
       options = args;
     }
     
-    tube = new Tube(options);
-    tube.load();
-
-		this.first().data('tube', tube);
+		var self = this.first();
+		self.data('tube', new Tube(options).load(function (success) {
+			self.html(this.html());
+		}));
   }
   
   return this;

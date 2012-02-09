@@ -161,9 +161,9 @@ describe('Tube', function () {
 			
 			describe('when there are videos in the tube', function () {
 				beforeEach(function () {
-					
+					tube.videos.push(new Video({ title: 'A Video' }));
+					tube.videos.push(new Video({ title: 'Another Video' }));
 				});
-				
 			});
 		});
 
