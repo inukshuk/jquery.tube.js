@@ -12,7 +12,6 @@ if (!String.prototype.supplant) {
 // methods exposed by jquery function plugin
 var methods = {
   load: Player.load,
-  
   ready: Player.ready,
 };
 
@@ -43,30 +42,8 @@ $.tube = function (command) {
   return $.isFunction(fn) ? fn.call() : fn;
 };
 
-
-$.tube.constants = {
-  gdata: {
-    api: 'http://gdata.youtube.com/feeds/api/videos',
-    map: {
-      'q': 'query',
-      'max-results': 'limit',
-      'key': 'key',
-      'format': 'format',
-      'orderby': 'order'
-    }
-  },
-  player: {
-    api: 'http://www.youtube.com/player_api'
-  }
-};
-
-$.tube.defaults = {
-  player: '#player',
-  order: 'published',
-  format: 5,
-  limit: false,
-  key: false
-};
+$.tube.constants = Tube.constants;
+$.tube.defaults = Tube.defaults;
 
 window.onYouTubePlayerAPIReady = function () {
   Player.ready = true;

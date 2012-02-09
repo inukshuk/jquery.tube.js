@@ -105,7 +105,7 @@ describe('Tube', function () {
       });
       
       it('returns an http url with options', function () {
-        tube.request().should.match(/^https?:[^\s]+\/?[\w\d%&?=\-]+$/);
+        tube.request().should.match(/^\/\/[^\s]+\/?[\w\d%&?=\-]+$/);
       });
     });
     
@@ -153,6 +153,20 @@ describe('Tube', function () {
       });
 
     });
+
+		describe('#html', function () {
+			it('returns an empty list by default', function () {
+				tube.html().should.equal('<ul></ul>');
+			});
+			
+			describe('when there are videos in the tube', function () {
+				beforeEach(function () {
+					
+				});
+				
+			});
+		});
+
   });
   
 });

@@ -34,7 +34,7 @@ FULL_LICENSE = <<-END
 END
 
 def normalize(text, tab = ' ', indent = 1)
-  text.gsub(/\t/, tab).gsub(/^/, tab * indent)
+  text.gsub(/^if\s*\(exports\).*/m, '').gsub(/\t/, tab).gsub(/^/, tab * indent)
 end
 
 task :test do
@@ -45,6 +45,7 @@ task :build do
   File.open('jquery.tube.js', 'w') do |f|
     f.puts FULL_LICENSE
     f.puts "(function ($, window, document, version, undefined) {\n  'use strict';"
+    f.puts normalize(File.open('./src/video.js', 'r:UTF-8').read)
     f.puts normalize(File.open('./src/tube.js', 'r:UTF-8').read)
     f.puts normalize(File.open('./src/player.js', 'r:UTF-8').read)
     f.puts normalize(File.open('./src/plugin.js', 'r:UTF-8').read)

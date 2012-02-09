@@ -24,18 +24,65 @@
 (function ($, window, document, version, undefined) {
   'use strict';
  
+ /** Video Constructor */
+ 
+ var Video = function (json) {
+  this.id = json.id.$t.match(/(\/[^\/]*)$/)[1];
+ 
+  this.title = json.title.$t;
+  this.description = json.media$group.media$description.$t;
+  this.thumbnails = $.map(json.media$group.media$thumbnails, function (thumb) {
+   if (thumb.url) {
+    return thumb.url;
+   }
+  }); 
+ };
+ 
+ Video.constants = {};
+ 
+ /** Returns the video as an HTML string */
+ Video.prototype.html = function () {
+  
+ };
+ 
+ 
  /** Tube Constructor */
  
  var Tube = function (options) {
    this.videos = [];
-   this.options = $.extend({}, $.tube.defaults, options);
+   this.options = $.extend({}, Tube.defaults, options);
  };
+ 
+ 
+ Tube.constants = {
+   api: '//gdata.youtube.com/feeds/api/' 
+ };
+ 
+ Tube.defaults = {
+   player: '#player',
+   order: 'published',
+   author: false,
+   version: 2,
+   format: 5,
+   limit: false,
+   key: false  
+ };
+ 
+ Tube.parameters = {
+   'q': 'query',
+   'max-results': 'limit',
+   'key': 'key',
+   'format': 'format',
+   'orderby': 'order',
+   'author': 'author',
+   'version': 'v'
+ };
+ 
  
  /** Static Tube Functions */
  
  /*
-  * Encodes a set of parameters.
-  * Returns the encoded parameters as a string.
+  * Encodes a set of parameters. Returns the encoded parameters as a string.
   */
  Tube.serialize = function (parameters) {
    var string;
@@ -78,33 +125,34 @@
   * Returns the tube object (non-blocking).
   */
  Tube.prototype.load = function (callback) {
-     var self = this;
+     var self = this, success = 0;
+ 
      $.getJSON(this.request(), function (data) {
-   if (callback && $.isFunction(callback)) {
-       $.each(data.feed.entry, function(ii, item) {
-    self.videos[ii] = {};
-    self.videos[ii].title = item['title']['$t'];
-    self.videos[ii].description = item['media$group']['media$description']['$t'];
-    var video = item['id']['$t'];
-    self.videos[ii].videoId = video.replace('http://gdata.youtube.com/feeds/api/videos/','');  //extracting the videoID
-    self.videos[ii].thumb = "http://img.youtube.com/vi/{videoId}/default.jpg".supplant({videoId: self.videos[ii].videoId});
+       success = data.feed.entry.length;
+       self.videos = $.map(data.feed.entry, function(item) {
+         return {
+           title: item.title.$t,
+           description: item.media$group.media$description.$t,
+           id: item.id.$t.replace('http://gdata.youtube.com/feeds/api/videos/','')
+         };
+         
        });
-   
-             callback.apply(self);
-   }
+ 
+       if (callback && $.isFunction(callback)) {  
+         callback.apply(self, success);
+       }
      });
      
      return this;
  };
  
  /** Returns the tube's gdata parameters as a hash */
- Tube.prototype.parameters = function (options) {
-   var parameters = {};
-   options = $.extend(options || {}, this.options);
+ Tube.prototype.parameters = function () {
+   var self = this, parameters = {};
    
-   $.each($.tube.constants.gdata.map, function (key, value) {
-     if (options[value]) {
-       parameters[key] = options[value];
+   $.each(Tube.parameters, function (key, value) {
+     if (self.options[value]) {
+       parameters[key] = self.options[value];
      }
    });
    
@@ -116,12 +164,33 @@
  
  /** Returns the tube's gdata request string */
  Tube.prototype.request = function (options) {
-   return [$.tube.constants.gdata.api, '?', Tube.serialize(this.parameters(options))].join('');
+   var api = Tube.constants.api;
+ 
+   $.extend(this.options, options || {});
+ 
+   // distinguish between playlist selection and video query
+   if (this.options.playlist) {
+     api += 'playlists/' + this.options.playlist;
+   }
+   else {
+     api += 'videos';
+   }
+   
+   return [api, '?', Tube.serialize(this.parameters())].join('');
  };
  
- if (exports) {
-  exports.Tube = Tube;
+ Tube.prototype.authenticate = function () {
+   
  };
+ 
+ /** Returns the video as an HTML string */
+ Tube.prototype.html = function () {
+  var elements = $.map(this.videos, function (video) {
+   return '<li>' + video.html() + '</li>';
+  });
+  return '<ul>' + elements.join('') + '</ul>';
+ };
+ 
  
  /** Player Constructor */
  
@@ -148,9 +217,6 @@
    return false;
  };
  
- if (exports) {
-  exports.Player = Player;
- }
  
  /** String Supplant from Douglas Crockford's Remedial JavaScript */
  if (!String.prototype.supplant) {
@@ -165,7 +231,6 @@
  // methods exposed by jquery function plugin
  var methods = {
    load: Player.load,
-   
    ready: Player.ready,
  };
  
@@ -196,30 +261,8 @@
    return $.isFunction(fn) ? fn.call() : fn;
  };
  
- 
- $.tube.constants = {
-   gdata: {
-     api: 'http://gdata.youtube.com/feeds/api/videos',
-     map: {
-       'q': 'query',
-       'max-results': 'limit',
-       'key': 'key',
-       'format': 'format',
-       'orderby': 'order'
-     }
-   },
-   player: {
-     api: 'http://www.youtube.com/player_api'
-   }
- };
- 
- $.tube.defaults = {
-   player: '#player',
-   order: 'published',
-   format: 5,
-   limit: false,
-   key: false
- };
+ $.tube.constants = Tube.constants;
+ $.tube.defaults = Tube.defaults;
  
  window.onYouTubePlayerAPIReady = function () {
    Player.ready = true;
