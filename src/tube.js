@@ -73,7 +73,9 @@ Tube.serialize = function (parameters) {
 /*
  * Populates the tube object with data from YouTube. If function is passed
  * as an argument to this method, it will be called when the AJAX request
- * returns. The callback will be applied to the tube object.
+ * returns. The callback will be applied to the tube object and passed the
+ * number of videos that were fetched (i.e., a zero value indicates failure
+ * or no results).
  * 
  * Returns the tube object (non-blocking).
  */
@@ -92,7 +94,7 @@ Tube.prototype.load = function (callback) {
       });
 
       if (callback && $.isFunction(callback)) {  
-        callback.apply(self, success);
+        callback.apply(self, [success]);
       }
     });
     

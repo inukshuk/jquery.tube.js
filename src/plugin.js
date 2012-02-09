@@ -18,7 +18,7 @@ var methods = {
 
 // the jquery fn plugin
 $.fn.tube = function (args) {
-  var playlist, options;
+  var tube, options;
   
   if (this.length) {
     
@@ -29,8 +29,10 @@ $.fn.tube = function (args) {
       options = args;
     }
     
-    playlist = new Tube(options);
-    playlist.load();
+    tube = new Tube(options);
+    tube.load();
+
+		this.first().data('tube', tube);
   }
   
   return this;
