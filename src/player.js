@@ -5,6 +5,10 @@ var Player = function (options) {
 	this.observers = [];
 };
 
+// mixin observable
+observable.apply(Tube.prototype);
+
+
 Player.ready = false;
 
 Player.load = function (callback) {
