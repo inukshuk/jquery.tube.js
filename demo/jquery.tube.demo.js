@@ -1,12 +1,9 @@
 ;(function ($, window, document, undefined) {
 	
-	// Load the YouTube Player API
-  // $.tube('load');
-
-  // Load a playlist from YouTube when the page has loaded
 	$(function () {
-	  $('#tube').tube('ctbto');
+		
+	  $('#tube').tube({ player: 'player', query: 'ctbto', autoload: true, limit: 5, start: 3 });
+	
 	});
 	
 }(jQuery, this, this.document));
-

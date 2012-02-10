@@ -5,7 +5,7 @@ var Tube = function (options) {
   this.videos = [];
   this.options = $.extend({}, Tube.defaults, options);
 	this.current = 0;
-	this.player = null;
+	this.player = new Player({ id: this.options.player });
 };
 
 Tube.constants = {
@@ -13,6 +13,10 @@ Tube.constants = {
 };
 
 Tube.defaults = {
+	player: 'player',
+	autoload: false, // load the player automatically?
+	autoplay: false,
+	start: 0,
   order: 'relevance', // 'published', 'rating', 'viewCount'
   author: false,
   version: 2,
@@ -88,7 +92,15 @@ Tube.prototype.load = function (callback) {
       self.videos = $.map(data.feed.entry, function(item) {
         return new Video().parse(item);
       });
-
+			
+			
+			// TODO check if player already exists for the DOM target and reuse it
+			
+			if (success && (self.options.autoload || self.options.autoplay)) {
+				self.current = Math.min(self.videos.length - 1, self.options.start);
+				self.player[self.options.autoplay ? 'play' : 'load'](self.videos[self.current]);
+			}
+			
       if (callback && $.isFunction(callback)) {  
         callback.apply(self, [success]);
       }
@@ -136,14 +148,19 @@ Tube.prototype.authenticate = function () {
 
 /*
  * Plays the video at the given index in the associated player.
- * If no index is given, plays the next video.
+ * If no index is given, resumes the current video.
  */
 Tube.prototype.play = function (index) {
-	var k =  index % this.videos.length;	
-	this.current = (k < 0) ? this.videos.length - k : k;
+	if ($.isNumeric(index)) {
+		var k = index % this.videos.length;	
+		this.current = (k < 0) ? this.videos.length - k : k;
 
-	if (this.player && this.videos.length) {
-		this.player.play(this.videos[this.current]);
+		if (this.player && this.videos.length) {
+			this.player.play(this.videos[this.current]);
+		}
+	}
+	else {
+		this.player.resume();
 	}
 	
 	return this;
@@ -151,14 +168,18 @@ Tube.prototype.play = function (index) {
 
 /** Pauses playback of the current player */
 Tube.prototype.pause = function (index) {
-
 	if (this.player) {
 		this.player.pause();
 	}
-	
 	return this;
 };
-Tube.prototype.stop = Tube.prototype.pause;
+
+Tube.prototype.stop = function (index) {
+	if (this.player) {
+		this.player.stop();
+	}
+	return this;
+};
 
 /** Plays the next video. */
 Tube.prototype.next = function () {
@@ -171,7 +192,7 @@ Tube.prototype.previous = function () {
 };
 
 Tube.prototype.advance = function (by) {	
-	return this.play(this.current + by || 1);
+	return this.play(this.current + (by || 1));
 };
 
 

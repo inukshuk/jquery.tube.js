@@ -16,6 +16,8 @@ Player.constants = {
 };
 
 Player.defaults = {
+	id: 'player',
+	quality: 'medium',
 	width: 640,
 	height: 360,
 	autohide: 2, // 0 = always visible, 1 = hide progress bar and controls, 2 = hide progress bar
@@ -28,35 +30,60 @@ Player.defaults = {
 
 /** Instance Methods */
 
-Player.prototype.load = function (callback) {
-	Player.load($.proxy(callback, this));	
+Player.prototype.play = function (video) {
+	if (!this.p) {
+		return this.load(video);
+	}
+
+	if (video) {
+		this.p.loadVideoById(video.id, 0, this.options.quality);		
+	}
+	else {
+		this.p.playVideo();
+	}
+	
 	return this;
 };
 
-Player.prototype.play = function (video) {
-	if (!this.p) {
-		return this.create_player(video);
+Player.prototype.resume = function () {
+	if (this.p) {
+		this.p.playVideo();
 	}
-	
-	
 	return this;
 };
 
 Player.prototype.pause = function () {
 	if (this.p) {
-		this.p.stopVideo();
+		this.p.pauseVideo();
 	}
-	
 	return this;
 };
 
-Player.prototype.stop = Player.prototype.pause;
+Player.prototype.stop = function () {
+	if (this.p) {
+		this.p.stopVideo();
+	}
+	return this;
+};
+
+Player.prototype.clear = function () {
+	if (this.p) {
+		this.p.stopVideo();
+		this.p.clearVideo();
+	}
+	return this;
+};
+
+
+
 
 Player.prototype.event_proxy_for = function (event) {
 	return $.proxy(this.notify, this, event);
 };
 
 /** API Dependent Methods */
+
+// TODO change switch to improve testability
 
 if ($.isFunction(window.postMessage)) {
 
@@ -74,7 +101,7 @@ if ($.isFunction(window.postMessage)) {
 	};
 	
 	Player.load = function (callback) {
-	  if (!YT) {
+	  if (typeof YT === 'undefined') {
 	    var tag = document.createElement('script');
 		
 			window.onYouTubePlayerAPIReady = function () {
@@ -83,7 +110,7 @@ if ($.isFunction(window.postMessage)) {
 				}
 			};
 
-	    tag.src = $.tube.constants.api;
+	    tag.src = Player.constants.api;
 	    $('script:first').before(tag);
 
 	    return false;
@@ -96,16 +123,23 @@ if ($.isFunction(window.postMessage)) {
 	  return true;
 	};
 	
-	Player.prototype.create_player = function (video) {
-		var self = this, options = $.extend({}, this.options, { videoId: video });
-		
-		// map youtube events to our own events
-		$.each(Player.constants.events, function (key, value) {
-			options[key] = self.event_proxy_for(value);
+	Player.prototype.load = function (video) {
+		var self = this, options = $.extend({}, this.options, { videoId: video.id });
+
+		Player.load(function () {
+			try {
+				// map youtube events to our own events
+				$.each(Player.constants.events, function (key, value) {
+					options[key] = self.event_proxy_for(value);
+				});
+
+				self.p = new YT.Player(options.id, options);
+			}
+			catch (error) {
+				console.log('Failed to load YouTube player: ', error);
+			}
 		});
-		
-		this.p = new YT.Player(options);
-		
+
 		return this;
 	};
 }
@@ -141,7 +175,7 @@ else {
 		return true;
 	};
 	
-	Player.prototype.create_player = function (video) {
+	Player.prototype.load = function (video) {
 		return this;
 	};
 	

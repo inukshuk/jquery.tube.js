@@ -1,7 +1,8 @@
 window = require('jsdom').jsdom().createWindow();
 jQuery = $ = require('jquery');
 
-common = require('../src/common.js');
+var common = require('../src/common.js');
+observable = common.observable;
 
 Video  = require('../src/video.js').Video;
 Tube   = require('../src/tube.js').Tube;

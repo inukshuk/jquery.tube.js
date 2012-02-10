@@ -24,7 +24,7 @@ var observable = function () {
 	
 	this.on = function (event, callback) {
 		this.observers = this.observers || {};
-		this.observers[event] = this.observers || [];
+		this.observers[event] = this.observers[event] || [];
 	
 		if ($.isFunction(callback)) {
 			this.observers[event].push(callback);			
