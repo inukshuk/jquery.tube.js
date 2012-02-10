@@ -8,9 +8,6 @@ var Tube = function (options) {
 	this.player = null;
 };
 
-// mixin observable
-observable.apply(Tube.prototype);
-
 Tube.constants = {
   api: '//gdata.youtube.com/feeds/api/' 
 };

@@ -1,8 +1,7 @@
 
 // methods exposed by jquery function plugin
 var methods = {
-  load: Player.load,
-  ready: Player.ready,
+  load: Player.load
 };
 
 
@@ -36,8 +35,3 @@ $.tube = function (command) {
 
 $.tube.constants = Tube.constants;
 $.tube.defaults = Tube.defaults;
-
-window.onYouTubePlayerAPIReady = function () {
-  Player.ready = true;
-  console.log('player API loaded');
-};
