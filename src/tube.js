@@ -8,6 +8,8 @@ var Tube = function (options) {
 	this.player = new Player({ id: this.options.player });
 };
 
+observable.apply(Tube.prototype);
+
 Tube.constants = {
   api: '//gdata.youtube.com/feeds/api/' 
 };

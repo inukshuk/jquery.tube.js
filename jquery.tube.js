@@ -44,39 +44,40 @@
  
  /** A Simple Observer Pattern Implementation */
  
- 
- var observable = function () {
+ var observable = function (observers) {
+  
+  // private observer list
+  observers = observers || {};
   
   this.on = function (event, callback) {
-   this.observers = this.observers || {};
-   this.observers[event] = this.observers[event] || [];
+   observers[event] = observers[event] || [];
   
    if ($.isFunction(callback)) {
-    this.observers[event].push(callback);   
+    observers[event].push(callback);   
    }
   
    return this;
   };
   
   this.off = function (event, callback) {
-   if (this.observers && this.observers[event]) {
-    var i, observers = this.observers[event], matches = [];
+   if (observers[event]) {
+    var i, os = observers[event], matches = [];
    
     if (callback) {
-     for (i = 0; i < observers.length; ++i) {
-      if (observers[i] === callback) {
+     for (i = 0; i < os.length; ++i) {
+      if (os[i] === callback) {
        matches.push(i);
       }
      }
     
      for (i = 0; i < matches; ++i) {
-      observers.remove(i);
+      os.remove(i);
      }
     
     }
     else {
      // remove all observers for the event
-     this.observers[event] = [];
+     observers[event] = [];
     }   
    }
   
@@ -84,8 +85,8 @@
   };
   
   this.notify = function (event) {
-   if (this.observers && this.observers[event]) {
-    $.each(this.observers[event], function () {
+   if (observers[event]) {
+    $.each(observers[event], function () {
      if ($.isFunction(this)) {
       this.call(event);
      }
@@ -226,6 +227,8 @@
   this.current = 0;
   this.player = new Player({ id: this.options.player });
  };
+ 
+ observable.apply(Tube.prototype);
  
  Tube.constants = {
    api: '//gdata.youtube.com/feeds/api/' 
