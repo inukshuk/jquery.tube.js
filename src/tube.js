@@ -219,8 +219,8 @@ Tube.prototype.advance = function (by) {
 /** Returns the video as an HTML string */
 Tube.prototype.render = function () {
 	var templates = this.options.templates;
-	var elements = $.map(this.videos, function (video) {
-		return '<li>' + video.render(templates) + '</li>';
+	var elements = $.map(this.videos, function (video, index) {
+		return '<li>' + video.render(templates, index) + '</li>';
 	});
 	
 	return '<ol>' + elements.join('') + '</ol>';

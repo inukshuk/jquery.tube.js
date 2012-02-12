@@ -123,7 +123,7 @@
   author: '<a href="{author_url}">{author}</a>',
   description: '<p>{description}</p>',
   statistics: '<span class="statistics">{views} / {favorites}</span>',
-  video: '<a href="#{id}">{title}{thumbnail}{description}<p>{author} – {statistics}</p></a>'
+  video: '<a href="#{id}" rel="{index}">{title}{thumbnail}{description}<p>{author} – {statistics}</p></a>'
  };
  
  
@@ -207,11 +207,12 @@
   return (h ? [h, pad(m), pad(s)] : [m, pad(s)]).join(':');
  };
  
- Video.prototype.properties = function () {
+ Video.prototype.properties = function (index) {
    var thumb = this.thumbnails[1] || this.thumbnails[0];
    
    return {
      id: this.id,
+     index: index,
      title: this.title,
      duration: this.duration(),
      description: this.description,
@@ -224,12 +225,13 @@
  };
  
  /** Returns the video as an HTML string */
- Video.prototype.render = function (templates) {
-   var properties = this.properties();
+ Video.prototype.render = function (templates, index) {
+   var properties = this.properties(index);
    templates = templates || Video.templates;
    
   return templates.video.supplant({
     id: this.id,
+    index: index,
    title: Video.templates.title.supplant(properties),
    thumbnail: Video.templates.thumbnail.supplant(properties),
    description: Video.templates.description.supplant(properties),
@@ -461,8 +463,8 @@
  /** Returns the video as an HTML string */
  Tube.prototype.render = function () {
   var templates = this.options.templates;
-  var elements = $.map(this.videos, function (video) {
-   return '<li>' + video.render(templates) + '</li>';
+  var elements = $.map(this.videos, function (video, index) {
+   return '<li>' + video.render(templates, index) + '</li>';
   });
   
   return '<ol>' + elements.join('') + '</ol>';
@@ -676,7 +678,16 @@
      
    element = this.first();
    element.data('tube', new Tube(options).load(function (success) {
-    element.append(this.render());
+     var tube = this, playlist = $(tube.render());
+ 
+     // setup on-click handlers to play video
+     $('a[rel]', playlist).click(function (event) {
+       event.preventDefault();      
+         tube.play($(this).attr('rel'));
+         console.log('play', $(this).attr('rel'), tube);
+     });
+     
+    element.append(playlist);
    }));
    }
    

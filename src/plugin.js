@@ -20,7 +20,15 @@ $.fn.tube = function (args) {
     
 		element = this.first();
 		element.data('tube', new Tube(options).load(function (success) {
-			element.append(this.render());
+		  var tube = this, playlist = $(tube.render());
+
+		  // setup on-click handlers to play video
+		  $('a[rel]', playlist).click(function (event) {
+		    event.preventDefault();		    
+        tube.play($(this).attr('rel'));
+		  });
+		  
+			element.append(playlist);
 		}));
   }
   
