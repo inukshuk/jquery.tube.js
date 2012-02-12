@@ -118,7 +118,7 @@ Tube.prototype.load = function (callback) {
         callback.apply(self, [success]);
       }
       
-      this.notify('load');
+      self.notify('load');
     });
     
     return this;

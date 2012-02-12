@@ -85,10 +85,12 @@
   };
   
   this.notify = function (event) {
+    var self = this;
+    
    if (observers[event]) {
     $.each(observers[event], function () {
      if ($.isFunction(this)) {
-      this.call(event);
+      this.apply(self, [event]);
      }
     });
    }
@@ -356,7 +358,7 @@
          callback.apply(self, [success]);
        }
        
-       this.notify('load');
+       self.notify('load');
      });
      
      return this;
@@ -669,7 +671,7 @@
      
    element = this.first();
    element.data('tube', new Tube(options).load(function (success) {
-    element.html(this.render());
+    element.append(this.render());
    }));
    }
    

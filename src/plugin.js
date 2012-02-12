@@ -20,7 +20,7 @@ $.fn.tube = function (args) {
     
 		element = this.first();
 		element.data('tube', new Tube(options).load(function (success) {
-			element.html(this.render());
+			element.append(this.render());
 		}));
   }
   

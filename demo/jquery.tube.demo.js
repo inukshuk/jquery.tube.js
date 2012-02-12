@@ -1,12 +1,13 @@
 ;(function ($, window, document, undefined) {
 	
+	var event_handler = function (event) {
+	  console.log('on ' + event, this);
+	};
+	
 	$(function () {
 		
 	  $('#tube').tube({ player: 'player', query: 'ctbto', autoload: true, limit: 5, start: 3,
-	    load: function () { console.log('on load', this); },
-	    play: function () { console.log('on play', this); },
-	    pause: function () { console.log('on pause', this); },
-	    stop: function () { console.log('on stop', this); }
+	    load: event_handler, play: event_handler, pause: event_handler, stop: event_handler
     });
 	
 	});

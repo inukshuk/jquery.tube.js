@@ -60,10 +60,12 @@ var observable = function (observers) {
 	};
 	
 	this.notify = function (event) {
+	  var self = this;
+	  
 		if (observers[event]) {
 			$.each(observers[event], function () {
 				if ($.isFunction(this)) {
-					this.call(event);
+					this.apply(self, [event]);
 				}
 			});
 		}
