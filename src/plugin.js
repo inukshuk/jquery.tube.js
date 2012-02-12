@@ -7,7 +7,7 @@ var methods = {
 
 // the jquery fn plugin
 $.fn.tube = function (args) {
-  var tube, options;
+  var element, options;
   
   if (this.length) {
     
@@ -18,9 +18,9 @@ $.fn.tube = function (args) {
       options = args;
     }
     
-		var self = this.first();
-		self.data('tube', new Tube(options).load(function (success) {
-			self.html(this.html());
+		element = this.first();
+		element.data('tube', new Tube(options).load(function (success) {
+			element.html(this.render());
 		}));
   }
   

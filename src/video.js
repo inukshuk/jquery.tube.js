@@ -4,7 +4,7 @@
 var Video = function (properties) {
 	this.statistics = {};
 	this.thumbnails = [];
-	
+
 	if (properties) {
 		$.extend(this, properties);
 	}
@@ -15,9 +15,9 @@ Video.constants = {
 };
 
 Video.templates = {
-	thumbnail: '<img src="{url}" width="{width}" height="{height}" title="{title}" />',
+	thumbnail: '<img src="{url}" title="{title}" />',
 	title: '<h1>{title} ({duration})</h1>',
-	author: '<a href="{url}">{name}</a>',
+	author: '<a href="{author_url}">{author}</a>',
 	description: '<p>{description}</p>',
 	statistics: '<span class="statistics">{views} / {favorites}</span>',
 	video: '{title}{thumbnail}{description}<p>{author} – {statistics}</p></div>'
@@ -104,14 +104,32 @@ Video.prototype.duration = function () {
 	return (h ? [h, pad(m), pad(s)] : [m, pad(s)]).join(':');
 };
 
+Video.prototype.properties = function () {
+  var thumb = this.thumbnails[1] || this.thumbnails[0];
+  
+  return {
+    title: this.title,
+    duration: this.duration(),
+    description: this.description,
+    author: this.author.name,
+    author_url: this.author.url,
+    views: this.statistics.views,
+    favorites: this.statistics.favorites,
+    url: thumb.url
+  };
+};
+
 /** Returns the video as an HTML string */
-Video.prototype.html = function () {
-	return Video.templates.video.supplant({
-		title: Video.templates.title.supplant({ title: this.title, duration: this.duration() }),
-		thumbnail: Video.templates.thumbnail.supplant(this.thumbnails[0]),
-		description: Video.templates.description.supplant(this),
-		author: Video.templates.author.supplant(this.author),
-		statistics: Video.templates.statistics.supplant(this.statistics)
+Video.prototype.render = function (templates) {
+  var properties = this.properties();
+  templates = templates || Video.templates;
+  
+	return templates.video.supplant({
+		title: Video.templates.title.supplant(properties),
+		thumbnail: Video.templates.thumbnail.supplant(properties),
+		description: Video.templates.description.supplant(properties),
+		author: Video.templates.author.supplant(properties),
+		statistics: Video.templates.statistics.supplant(properties)
 	});
 };
 

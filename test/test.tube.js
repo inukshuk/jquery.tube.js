@@ -156,7 +156,7 @@ describe('Tube', function () {
 
 		describe('#html', function () {
 			it('returns an empty list by default', function () {
-				tube.html().should.equal('<ol></ol>');
+				tube.render().should.equal('<ol></ol>');
 			});
 			
 			describe('when there are videos in the tube', function () {

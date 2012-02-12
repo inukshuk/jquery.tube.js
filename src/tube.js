@@ -2,10 +2,19 @@
 /** Tube Constructor */
 
 var Tube = function (options) {
+  var self = this;
+
   this.videos = [];
   this.options = $.extend({}, Tube.defaults, options);
 	this.current = 0;
 	this.player = new Player({ id: this.options.player });
+	
+	// register event handlers
+	$.each(Tube.events, function (idx, event) {
+	  if (self.options[event]) {
+      self.on(event, self.options[event]);
+    }
+	});
 };
 
 observable.apply(Tube.prototype);
@@ -36,6 +45,8 @@ Tube.parameters = {
   'author': 'author',
   'version': 'v'
 };
+
+Tube.events = ['load', 'play', 'pause'];
 
 
 /** Static Tube Functions */
@@ -106,6 +117,8 @@ Tube.prototype.load = function (callback) {
       if (callback && $.isFunction(callback)) {  
         callback.apply(self, [success]);
       }
+      
+      this.notify('load');
     });
     
     return this;
@@ -200,10 +213,13 @@ Tube.prototype.advance = function (by) {
 
 
 /** Returns the video as an HTML string */
-Tube.prototype.html = function () {
+Tube.prototype.render = function (templates) {
+	templates = $.extend(templates || {}, this.options.templates || Video.templates);
+	
 	var elements = $.map(this.videos, function (video) {
-		return '<li>' + video.html() + '</li>';
+		return '<li>' + video.render(templates) + '</li>';
 	});
+	
 	return '<ol>' + elements.join('') + '</ol>';
 };
 
