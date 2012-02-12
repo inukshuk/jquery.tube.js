@@ -8,7 +8,9 @@ var Tube = function (options) {
   this.options = $.extend({}, Tube.defaults, options);
 	this.current = 0;
 	this.player = new Player({ id: this.options.player });
-	
+
+	this.options.templates = $.extend(Video.templates, this.options.templates || {});
+
 	// register event handlers
 	$.each(Tube.events, function (idx, event) {
 	  if (self.options[event]) {
@@ -46,7 +48,7 @@ Tube.parameters = {
   'version': 'v'
 };
 
-Tube.events = ['load', 'play', 'pause'];
+Tube.events = ['load', 'ready', 'play', 'pause'];
 
 
 /** Static Tube Functions */
@@ -113,12 +115,14 @@ Tube.prototype.load = function (callback) {
 				self.current = Math.min(self.videos.length - 1, self.options.start);
 				self.player[self.options.autoplay ? 'play' : 'load'](self.videos[self.current]);
 			}
+
+      self.notify('load');
 			
       if (callback && $.isFunction(callback)) {  
         callback.apply(self, [success]);
       }
       
-      self.notify('load');
+      self.notify('ready');
     });
     
     return this;
@@ -213,9 +217,8 @@ Tube.prototype.advance = function (by) {
 
 
 /** Returns the video as an HTML string */
-Tube.prototype.render = function (templates) {
-	templates = $.extend(templates || {}, this.options.templates || Video.templates);
-	
+Tube.prototype.render = function () {
+	var templates = this.options.templates;
 	var elements = $.map(this.videos, function (video) {
 		return '<li>' + video.render(templates) + '</li>';
 	});

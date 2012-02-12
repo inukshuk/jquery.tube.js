@@ -20,7 +20,7 @@ Video.templates = {
 	author: '<a href="{author_url}">{author}</a>',
 	description: '<p>{description}</p>',
 	statistics: '<span class="statistics">{views} / {favorites}</span>',
-	video: '{title}{thumbnail}{description}<p>{author} – {statistics}</p></div>'
+	video: '<a href="#{id}">{title}{thumbnail}{description}<p>{author} – {statistics}</p></a>'
 };
 
 
@@ -108,6 +108,7 @@ Video.prototype.properties = function () {
   var thumb = this.thumbnails[1] || this.thumbnails[0];
   
   return {
+    id: this.id,
     title: this.title,
     duration: this.duration(),
     description: this.description,
@@ -125,6 +126,7 @@ Video.prototype.render = function (templates) {
   templates = templates || Video.templates;
   
 	return templates.video.supplant({
+	  id: this.id,
 		title: Video.templates.title.supplant(properties),
 		thumbnail: Video.templates.thumbnail.supplant(properties),
 		description: Video.templates.description.supplant(properties),
