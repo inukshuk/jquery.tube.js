@@ -258,8 +258,8 @@
  
   // Register Tube event handlers
   $.each(Tube.events, function (idx, event) {
-    if (self.options[event]) {
-       self.on(event, self.options[event]);
+    if (self.options.events[event]) {
+       self.on(event, self.options.events[event]);
      }
   });
   
@@ -268,8 +268,8 @@
     
     self.player.on(event, $.proxy(self.notify, self, event));
     
-    if (self.options[event]) {
-       self.on(event, self.options[event]);
+    if (self.options.events[event]) {
+       self.on(event, self.options.events[event]);
      }
   });
   
