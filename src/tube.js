@@ -7,16 +7,27 @@ var Tube = function (options) {
   this.videos = [];
   this.options = $.extend({}, Tube.defaults, options);
 	this.current = 0;
-	this.player = new Player({ id: this.options.player });
+	this.player = new Player(this.player_options());
 
 	this.options.templates = $.extend(Video.templates, this.options.templates || {});
 
-	// register event handlers
+	// Register Tube event handlers
 	$.each(Tube.events, function (idx, event) {
 	  if (self.options[event]) {
       self.on(event, self.options[event]);
     }
 	});
+	
+	// Register Player event proxies and handlers
+	$.each(Player.events, function (idx, event) {
+	  
+	  self.player.on(event, $.proxy(self.notify, self, event));
+	  
+	  if (self.options[event]) {
+      self.on(event, self.options[event]);
+    }
+	});
+	
 };
 
 observable.apply(Tube.prototype);
@@ -32,6 +43,8 @@ Tube.defaults = {
 	start: 0,
   order: 'relevance', // 'published', 'rating', 'viewCount'
   author: false,
+  hide: 2, // 0 = always visible, 1 = hide progress bar and controls, 2 = hide progress bar
+  controls: 1,
   version: 2,
   format: 5,
   limit: 10,
@@ -48,7 +61,7 @@ Tube.parameters = {
   'version': 'v'
 };
 
-Tube.events = ['load', 'ready', 'play', 'pause'];
+Tube.events = ['load', 'ready', 'stop'];
 
 
 /** Static Tube Functions */
@@ -113,7 +126,7 @@ Tube.prototype.load = function (callback) {
 			
 			if (success && (self.options.autoload || self.options.autoplay)) {
 				self.current = Math.min(self.videos.length - 1, Math.max(0, self.options.start - 1));
-				self.player[self.options.autoplay ? 'play' : 'load'](self.videos[self.current]);
+				self.player.load(self.videos[self.current]);
 			}
 
       self.notify('load');
@@ -126,6 +139,18 @@ Tube.prototype.load = function (callback) {
     });
     
     return this;
+};
+
+/** Returns the tube's player options as a hash */
+Tube.prototype.player_options = function () {
+  return {
+    id: this.options.player,
+    playerVars: $.extend({
+      autoplay: this.options.autoplay,
+      autohide: this.options.hide,
+      controls: this.options.controls
+    }, Player.defaults)
+  };
 };
 
 /** Returns the tube's gdata parameters as a hash */
@@ -196,18 +221,19 @@ Tube.prototype.pause = function (index) {
 Tube.prototype.stop = function (index) {
 	if (this.player) {
 		this.player.stop();
+		this.notify('stop');
 	}
 	return this;
 };
 
 /** Plays the next video. */
 Tube.prototype.next = function () {
-	return this.advance(1);
+	return this.advance(1).notify('next');
 };
 
 /** Plays the previous video. */
 Tube.prototype.previous = function () {
-	return this.advance(-1);
+	return this.advance(-1).notify('previous');
 };
 
 Tube.prototype.advance = function (by) {	

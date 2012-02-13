@@ -59,13 +59,13 @@ var observable = function (observers) {
 		return this;
 	};
 	
-	this.notify = function (event) {
-	  var self = this;
+	this.notify = function () {
+	  var self = this, args = Array.prototype.slice.apply(arguments), event = arguments[0];
 	  
 		if (observers[event]) {
 			$.each(observers[event], function () {
 				if ($.isFunction(this)) {
-					this.apply(self, [event]);
+					this.apply(self, args);
 				}
 			});
 		}

@@ -84,13 +84,13 @@
    return this;
   };
   
-  this.notify = function (event) {
-    var self = this;
+  this.notify = function () {
+    var self = this, args = Array.prototype.slice.apply(arguments), event = arguments[0];
     
    if (observers[event]) {
     $.each(observers[event], function () {
      if ($.isFunction(this)) {
-      this.apply(self, [event]);
+      this.apply(self, args);
      }
     });
    }
@@ -252,16 +252,27 @@
    this.videos = [];
    this.options = $.extend({}, Tube.defaults, options);
   this.current = 0;
-  this.player = new Player({ id: this.options.player });
+  this.player = new Player(this.player_options());
  
   this.options.templates = $.extend(Video.templates, this.options.templates || {});
  
-  // register event handlers
+  // Register Tube event handlers
   $.each(Tube.events, function (idx, event) {
     if (self.options[event]) {
        self.on(event, self.options[event]);
      }
   });
+  
+  // Register Player event proxies and handlers
+  $.each(Player.events, function (idx, event) {
+    
+    self.player.on(event, $.proxy(self.notify, self, event));
+    
+    if (self.options[event]) {
+       self.on(event, self.options[event]);
+     }
+  });
+  
  };
  
  observable.apply(Tube.prototype);
@@ -277,6 +288,8 @@
   start: 0,
    order: 'relevance', // 'published', 'rating', 'viewCount'
    author: false,
+   hide: 2, // 0 = always visible, 1 = hide progress bar and controls, 2 = hide progress bar
+   controls: 1,
    version: 2,
    format: 5,
    limit: 10,
@@ -293,7 +306,7 @@
    'version': 'v'
  };
  
- Tube.events = ['load', 'ready', 'play', 'pause'];
+ Tube.events = ['load', 'ready', 'stop'];
  
  
  /** Static Tube Functions */
@@ -358,7 +371,7 @@
     
     if (success && (self.options.autoload || self.options.autoplay)) {
      self.current = Math.min(self.videos.length - 1, Math.max(0, self.options.start - 1));
-     self.player[self.options.autoplay ? 'play' : 'load'](self.videos[self.current]);
+     self.player.load(self.videos[self.current]);
     }
  
        self.notify('load');
@@ -371,6 +384,18 @@
      });
      
      return this;
+ };
+ 
+ /** Returns the tube's player options as a hash */
+ Tube.prototype.player_options = function () {
+   return {
+     id: this.options.player,
+     playerVars: $.extend({
+       autoplay: this.options.autoplay,
+       autohide: this.options.hide,
+       controls: this.options.controls
+     }, Player.defaults)
+   };
  };
  
  /** Returns the tube's gdata parameters as a hash */
@@ -441,18 +466,19 @@
  Tube.prototype.stop = function (index) {
   if (this.player) {
    this.player.stop();
+   this.notify('stop');
   }
   return this;
  };
  
  /** Plays the next video. */
  Tube.prototype.next = function () {
-  return this.advance(1);
+  return this.advance(1).notify('next');
  };
  
  /** Plays the previous video. */
  Tube.prototype.previous = function () {
-  return this.advance(-1);
+  return this.advance(-1).notify('previous');
  };
  
  Tube.prototype.advance = function (by) { 
@@ -479,80 +505,112 @@
  
  var Player = function (options) {
    this.options = options;
-  this.p = null;
+   this.p = null;
+ 
+   // Handle YouTube's state change events and dispatch using our taxonomy
+   this.on('state', function (name, event) {
+     if (event) {
+       switch (event.data) {
+         case -1:
+           this.notify('unstarted');
+           break;
+         case YT.PlayerState.ENDED:
+           this.notify('end');
+           break;
+         case YT.PlayerState.PLAYING:
+           this.notify('play');
+           break;
+         case YT.PlayerState.PAUSED:
+           this.notify('pause');
+           break;
+         case YT.PlayerState.BUFFERING:
+           this.notify('buffer');
+           break;
+         case YT.PlayerState.CUED:
+           this.notify('cue');
+           break;
+ 
+         default:
+         // ignore
+       }
+     }
+   });
+   
  };
  
- // mixin observer pattern
+ // Mix-in observer pattern
  observable.apply(Player.prototype);
  
  Player.constants = {
-  swfobject: '//ajax.googleapis.com/ajax/libs/swfobject/2.2/swfobject.js'
+   swfobject: '//ajax.googleapis.com/ajax/libs/swfobject/2.2/swfobject.js'
  };
  
  Player.defaults = {
-  id: 'player',
-  quality: 'medium',
-  width: 640,
-  height: 360,
-  autohide: 2, // 0 = always visible, 1 = hide progress bar and controls, 2 = hide progress bar
-  autoplay: 0,
-  controls: 1,
-  loop: 0,
-  theme: 'dark' // 'light'
+   id: 'player',
+   width: 640,
+   height: 360,
+   playerVars: {
+     autohide: 2, // 0 = always visible, 1 = hide progress bar and controls, 2 = hide progress bar
+     autoplay: 0,
+     controls: 1,
+     enablejsapi: 1,
+     loop: 0
+   }
  };
  
+ Player.events = ['unstarted', 'end', 'play', 'cue', 'buffer', 'pause', 'error'];
  
  /** Instance Methods */
  
  Player.prototype.play = function (video) {
-  if (!this.p) {
-   return this.load(video);
-  }
+   if (!this.p) {
+     return this.load(video);
+   }
  
-  if (video) {
-   this.p.loadVideoById(video.id, 0, this.options.quality);  
-  }
-  else {
-   this.p.playVideo();
-  }
-  
-  return this;
+   if (video) {
+     this.p.loadVideoById(video.id, 0, this.options.quality);    
+   }
+   else {
+     this.p.playVideo();
+   }
+   
+   return this;
  };
  
  Player.prototype.resume = function () {
-  if (this.p) {
-   this.p.playVideo();
-  }
-  return this;
+   if (this.p) {
+     this.p.playVideo();
+   }
+   return this;
  };
  
  Player.prototype.pause = function () {
-  if (this.p) {
-   this.p.pauseVideo();
-  }
-  return this;
+   if (this.p) {
+     this.p.pauseVideo();
+   }
+   return this;
  };
  
  Player.prototype.stop = function () {
-  if (this.p) {
-   this.p.stopVideo();
-  }
-  return this;
+   if (this.p) {
+     this.p.stopVideo();
+   }
+   return this;
  };
  
  Player.prototype.clear = function () {
-  if (this.p) {
-   this.p.stopVideo();
-   this.p.clearVideo();
-  }
-  return this;
+   if (this.p) {
+     this.p.stopVideo();
+     this.p.clearVideo();
+   }
+   return this;
  };
  
  
  
  
  Player.prototype.event_proxy_for = function (event) {
-  return $.proxy(this.notify, this, event);
+   return $.proxy(this.notify, this, event);
  };
  
  /** API Dependent Methods */
@@ -561,98 +619,98 @@
  
  if ($.isFunction(window.postMessage)) {
  
-  // Use the iFrame API
-  // https://code.google.com/apis/youtube/iframe_api_reference.html
-  
-  Player.api = 'iframe';
-  Player.constants.api = '//www.youtube.com/player_api';
-  
-  Player.constants.events = {
-   onReady: 'ready',
-   onStateChange: 'state',
-   onPlaybackQualityChange: 'quality',
-   onError: 'error'
-  };
-  
-  Player.load = function (callback) {
-    if (typeof YT === 'undefined') {
-      var tag = document.createElement('script');
+   // Use the iFrame API
+   // https://code.google.com/apis/youtube/iframe_api_reference.html
    
-    window.onYouTubePlayerAPIReady = function () {
-     if ($.isFunction(callback)) {
-      callback.call();
+   Player.api = 'iframe';
+   Player.constants.api = '//www.youtube.com/player_api';
+   
+   Player.constants.events = {
+     onReady: 'ready',
+     onStateChange: 'state',
+     onPlaybackQualityChange: 'quality',
+     onError: 'error'
+   };
+   
+   Player.load = function (callback) {
+     if (typeof YT === 'undefined') {
+       var tag = document.createElement('script');
+     
+       window.onYouTubePlayerAPIReady = function () {
+         if ($.isFunction(callback)) {
+           callback.call();
+         }
+       };
+ 
+       tag.src = Player.constants.api;
+       $('script:first').before(tag);
+ 
+       return false;
      }
-    };
+     
+     if ($.isFunction(callback)) {
+       setTimeout(callback, 0);
+     }
  
-      tag.src = Player.constants.api;
-      $('script:first').before(tag);
- 
-      return false;
-    }
+     return true;
+   };
    
-   if ($.isFunction(callback)) {
-    setTimeout(callback, 0);
-   }
+   Player.prototype.load = function (video) {
+     var self = this, options = $.extend({}, this.options, { videoId: video.id, events: {} });
  
-    return true;
-  };
-  
-  Player.prototype.load = function (video) {
-   var self = this, options = $.extend({}, this.options, { videoId: video.id });
+     Player.load(function () {
+       try {
+         // Map YouTube native events to our own events
+         $.each(Player.constants.events, function (key, value) {
+           options.events[key] = self.event_proxy_for(value);
+         });
  
-   Player.load(function () {
-    try {
-     // map youtube events to our own events
-     $.each(Player.constants.events, function (key, value) {
-      options[key] = self.event_proxy_for(value);
+         self.p = new YT.Player(options.id, options);
+       }
+       catch (error) {
+         console.log('Failed to load YouTube player: ', error);
+       }
      });
  
-     self.p = new YT.Player(options.id, options);
-    }
-    catch (error) {
-     console.log('Failed to load YouTube player: ', error);
-    }
-   });
- 
-   return this;
-  };
+     return this;
+   };
  }
  else {
-  
-  // Use the JavaScript API
-  // https://code.google.com/apis/youtube/js_api_reference.html
-  // https://code.google.com/p/swfobject/
-  
-  Player.api = 'js';
-  Player.constants.api = '//www.youtube.com/v/{video}?enablejsapi=1&playerapiid=ytplayer&version=3';
-  
-  Player.load = function (callback) {
-   if (!swfobject) {
-      var tag = document.createElement('script');
- 
-    $(tag).load(function () {
-     if ($.isFunction(callback)) {
-      callback.call();
-     }   
-    });
- 
-      tag.src = Player.constants.swfobject;
-      $('script:first').before(tag);
-  
-    return false;
-   }
    
-   if ($.isFunction(callback)) {
-    setTimeout(callback, 0);
-   }   
+   // Use the JavaScript API
+   // https://code.google.com/apis/youtube/js_api_reference.html
+   // https://code.google.com/p/swfobject/
+   
+   Player.api = 'js';
+   Player.constants.api = '//www.youtube.com/v/{video}?enablejsapi=1&playerapiid=ytplayer&version=3';
+   
+   Player.load = function (callback) {
+     if (!swfobject) {
+       var tag = document.createElement('script');
  
-   return true;
-  };
-  
-  Player.prototype.load = function (video) {
-   return this;
-  };
-  
+       $(tag).load(function () {
+         if ($.isFunction(callback)) {
+           callback.call();
+         }     
+       });
+ 
+       tag.src = Player.constants.swfobject;
+       $('script:first').before(tag);
+   
+       return false;
+     }
+     
+     if ($.isFunction(callback)) {
+       setTimeout(callback, 0);
+     }     
+ 
+     return true;
+   };
+   
+   Player.prototype.load = function (video) {
+     return this;
+   };
+   
  }
  
  
