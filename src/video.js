@@ -104,6 +104,7 @@ Video.prototype.duration = function () {
 	return (h ? [h, pad(m), pad(s)] : [m, pad(s)]).join(':');
 };
 
+/** Returns the image as a property hash (used by the templates) */
 Video.prototype.properties = function (index) {
   var thumb = this.thumbnails[1] || this.thumbnails[0];
   

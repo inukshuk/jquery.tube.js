@@ -112,7 +112,7 @@ Tube.prototype.load = function (callback) {
 			// TODO check if player already exists for the DOM target and reuse it
 			
 			if (success && (self.options.autoload || self.options.autoplay)) {
-				self.current = Math.min(self.videos.length - 1, self.options.start);
+				self.current = Math.min(self.videos.length - 1, Math.max(0, self.options.start - 1));
 				self.player[self.options.autoplay ? 'play' : 'load'](self.videos[self.current]);
 			}
 

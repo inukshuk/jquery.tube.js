@@ -207,6 +207,7 @@
   return (h ? [h, pad(m), pad(s)] : [m, pad(s)]).join(':');
  };
  
+ /** Returns the image as a property hash (used by the templates) */
  Video.prototype.properties = function (index) {
    var thumb = this.thumbnails[1] || this.thumbnails[0];
    
@@ -356,7 +357,7 @@
     // TODO check if player already exists for the DOM target and reuse it
     
     if (success && (self.options.autoload || self.options.autoplay)) {
-     self.current = Math.min(self.videos.length - 1, self.options.start);
+     self.current = Math.min(self.videos.length - 1, Math.max(0, self.options.start - 1));
      self.player[self.options.autoplay ? 'play' : 'load'](self.videos[self.current]);
     }
  
@@ -684,7 +685,6 @@
      $('a[rel]', playlist).click(function (event) {
        event.preventDefault();      
          tube.play($(this).attr('rel'));
-         console.log('play', $(this).attr('rel'), tube);
      });
      
     element.append(playlist);
