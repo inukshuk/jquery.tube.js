@@ -14,6 +14,26 @@ This plugin contains no stylesheets; tube instances create simple HTML
 lists of their contents (the structure can be adjusted for each instance
 through a simple template system).
 
+Documentation
+-------------
+
+For the time being, consult the examples in the `demo` and `test`
+directories.
+
+
+Development
+-----------
+
+This plugin uses the awesome [mocha](https://github.com/visionmedia/mocha)
+framework for testing; in order to run the tests you need to install a
+few libraries through npm:
+
+    $ npm install -g mocha
+    $ npm install -g should
+    $ npm install jsdom
+    $ npm install jquery
+    $ make test
+    
 
 License
 -------
