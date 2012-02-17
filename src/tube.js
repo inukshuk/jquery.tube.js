@@ -48,7 +48,8 @@ Tube.defaults = {
   version: 2,
   format: 5,
   limit: 10,
-  key: false  
+  key: false,
+	events: []
 };
 
 Tube.parameters = {
@@ -124,7 +125,7 @@ Tube.prototype.load = function (callback) {
 			
 			// TODO check if player already exists for the DOM target and reuse it
 			
-			if (success && (self.options.autoload || self.options.autoplay)) {
+			if (success && (self.options.autoload || self.options.start)) {
 				self.current = Math.min(self.videos.length - 1, Math.max(0, self.options.start - 1));
 				self.player.load(self.videos[self.current]);
 			}
