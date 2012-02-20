@@ -11,6 +11,8 @@ var Tube = function (options) {
 
 	this.options.templates = $.extend(Video.templates, this.options.templates || {});
 
+  observable.apply(this);
+
 	// Register Tube event handlers
 	$.each(Tube.events, function (idx, event) {
 	  if (self.options.events[event]) {
@@ -29,8 +31,6 @@ var Tube = function (options) {
 	});
 	
 };
-
-observable.apply(Tube.prototype);
 
 Tube.constants = {
   api: '//gdata.youtube.com/feeds/api/' 

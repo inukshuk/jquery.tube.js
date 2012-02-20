@@ -34,6 +34,16 @@ var observable = function (observers) {
 		return this;
 	};
 	
+	// registers a one-time event handler
+	this.once = function (event, callback) {
+	  var self = this;
+	  
+	  return this.on(event, function () {
+	    self.off(event, callback);
+	    callback.apply(self, arguments);
+	  });
+	};
+	
 	this.off = function (event, callback) {
 		if (observers[event]) {
 			var i, os = observers[event], matches = [];

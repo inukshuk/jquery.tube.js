@@ -4,8 +4,13 @@
  */
 
 var Player = function (options) {
+  var self = this;
+  
   this.options = options;
   this.p = null;
+
+  // Mix-in observer pattern
+  observable.apply(this);
 
   // Handle YouTube's state change events and dispatch using our taxonomy
   this.on('state', function (name, event) {
@@ -36,10 +41,14 @@ var Player = function (options) {
     }
   });
   
+  // Store the player reference on load (for reuse)
+  this.once('ready', function (event) {
+    if (self.p) {
+      $('#' + self.options.id).data('player', self.p);
+    }
+  });
+  
 };
-
-// Mix-in observer pattern
-observable.apply(Player.prototype);
 
 Player.constants = {
   swfobject: '//ajax.googleapis.com/ajax/libs/swfobject/2.2/swfobject.js'
@@ -156,19 +165,40 @@ if ($.isFunction(window.postMessage)) {
   };
   
   Player.prototype.load = function (video) {
-    var self = this, options = $.extend({}, this.options, { videoId: video.id, events: {} });
+    var self = this, options = $.extend({}, this.options, { videoId: video.id, events: {} }),
+      dom = $('#' + options.id);
 
     Player.load(function () {
       try {
-        // Map YouTube native events to our own events
-        $.each(Player.constants.events, function (key, value) {
-          options.events[key] = self.event_proxy_for(value);
-        });
+        
+        // Check whether or not a Player instance already exists
+        if (dom.data('player')) {
+          
+          // Extract the player reference
+          self.p = dom.data('player');
+        
+          // Register event proxies
+          $.each(Player.constants.events, function (key, value) {
+            self.p.addEventListener(key, self.event_proxy_for(value));
+          });
+          
+        }
+        else {
+          // Map YouTube native events to our own events
+          $.each(Player.constants.events, function (key, value) {
+            options.events[key] = self.event_proxy_for(value);
+          });
 
-        self.p = new YT.Player(options.id, options);
+          self.p = new YT.Player(options.id, options);
+
+          // Store a player reference
+          dom.data('player', self.p);
+        }
+        
       }
       catch (error) {
-        console.log('Failed to load YouTube player: ', error);
+        // console.log('Failed to load YouTube player: ', error);
+        dom.insert('Failed to load YouTube player: ' + error.toString());
       }
     });
 

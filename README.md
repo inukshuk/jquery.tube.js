@@ -32,7 +32,7 @@ few libraries through npm:
     $ npm install -g should
     $ npm install jsdom
     $ npm install jquery
-    $ make test
+    $ rake test
     
 
 License

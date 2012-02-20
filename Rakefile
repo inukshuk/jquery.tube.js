@@ -4,7 +4,7 @@ require 'uglifier'
 VERSION = '0.0.1'
 
 LICENSE = <<-END
-/*! jquery.tube.js #{VERSION} | https://github.com/inukshuk/jquery.tube.js */
+/*! jquery.tube.js #{VERSION} | https://github.com/inukshuk/jquery.tube.js/blob/master/LICENSE */
 END
 
 FULL_LICENSE = <<-END
@@ -33,7 +33,7 @@ FULL_LICENSE = <<-END
  
 END
 
-def normalize(text, tab = ' ', indent = 1)
+def normalize(text, tab = '  ', indent = 1)
   text.gsub(/^if\s*\(exports\).*/m, '').gsub(/\t/, tab).gsub(/^/, tab * indent)
 end
 
