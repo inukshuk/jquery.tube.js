@@ -148,6 +148,8 @@ if ($.isFunction(window.postMessage)) {
     if (typeof YT === 'undefined') {
       var tag = document.createElement('script');
     
+      // NB: possible race condition if multiple player instances are loaded
+      // at the same time.  
       window.onYouTubePlayerAPIReady = function () {
         if ($.isFunction(callback)) {
           callback.call();
