@@ -43,9 +43,7 @@ var Player = function (options) {
   
   // Store the player reference on load (for reuse)
   this.once('ready', function (event) {
-    if (self.p) {
-      $('#' + self.options.id).data('player', self.p);
-    }
+    $('#' + self.options.id).data('player', self);
   });
   
 };
@@ -71,13 +69,18 @@ Player.events = ['unstarted', 'end', 'play', 'cue', 'buffer', 'pause', 'error'];
 
 /** Instance Methods */
 
+/*
+ * Plays-back the passed-in video. The parameter can either be a YouTube
+ * video id or a video object. If no video is given, the currently loaded
+ * video will be played-back.
+ */
 Player.prototype.play = function (video) {
   if (!this.p) {
     return this.load(video);
   }
 
-  if (video) {
-    this.p.loadVideoById(video.id, 0, this.options.quality);    
+  if (video) {    
+    this.p.loadVideoById(video.id || video, 0, this.options.quality);    
   }
   else {
     this.p.playVideo();
@@ -165,7 +168,7 @@ if ($.isFunction(window.postMessage)) {
   };
   
   Player.prototype.load = function (video) {
-    var self = this, options = $.extend({}, this.options, { videoId: video.id, events: {} }),
+    var self = this, options = $.extend({}, this.options, { videoId: video.id || video, events: {} }),
       dom = $('#' + options.id);
 
     Player.load(function () {
@@ -175,7 +178,7 @@ if ($.isFunction(window.postMessage)) {
         if (dom.data('player')) {
           
           // Extract the player reference
-          self.p = dom.data('player');
+          self.p = dom.data('player').p;
         
           // Register event proxies
           $.each(Player.constants.events, function (key, value) {
@@ -192,13 +195,13 @@ if ($.isFunction(window.postMessage)) {
           self.p = new YT.Player(options.id, options);
 
           // Store a player reference
-          dom.data('player', self.p);
+          dom.data('player', self);
         }
         
       }
       catch (error) {
         // console.log('Failed to load YouTube player: ', error);
-        dom.insert('Failed to load YouTube player: ' + error.toString());
+        dom.append('Failed to load YouTube player: ' + error.toString());
       }
     });
 

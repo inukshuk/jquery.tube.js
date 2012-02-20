@@ -49,6 +49,7 @@ Tube.defaults = {
   format: 5,
   limit: 10,
   key: false,
+  render: true,
 	events: []
 };
 
@@ -135,7 +136,7 @@ Tube.prototype.load = function (callback) {
       if (callback && $.isFunction(callback)) {  
         callback.apply(self, [success]);
       }
-      
+
       self.notify('ready');
     });
     

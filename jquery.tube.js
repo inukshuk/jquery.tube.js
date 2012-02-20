@@ -304,6 +304,7 @@
     format: 5,
     limit: 10,
     key: false,
+    render: true,
     events: []
   };
   
@@ -390,7 +391,7 @@
         if (callback && $.isFunction(callback)) {  
           callback.apply(self, [success]);
         }
-        
+  
         self.notify('ready');
       });
       
@@ -554,9 +555,7 @@
     
     // Store the player reference on load (for reuse)
     this.once('ready', function (event) {
-      if (self.p) {
-        $('#' + self.options.id).data('player', self.p);
-      }
+      $('#' + self.options.id).data('player', self);
     });
     
   };
@@ -582,13 +581,18 @@
   
   /** Instance Methods */
   
+  /*
+   * Plays-back the passed-in video. The parameter can either be a YouTube
+   * video id or a video object. If no video is given, the currently loaded
+   * video will be played-back.
+   */
   Player.prototype.play = function (video) {
     if (!this.p) {
       return this.load(video);
     }
   
-    if (video) {
-      this.p.loadVideoById(video.id, 0, this.options.quality);    
+    if (video) {    
+      this.p.loadVideoById(video.id || video, 0, this.options.quality);    
     }
     else {
       this.p.playVideo();
@@ -676,7 +680,7 @@
     };
     
     Player.prototype.load = function (video) {
-      var self = this, options = $.extend({}, this.options, { videoId: video.id, events: {} }),
+      var self = this, options = $.extend({}, this.options, { videoId: video.id || video, events: {} }),
         dom = $('#' + options.id);
   
       Player.load(function () {
@@ -686,7 +690,7 @@
           if (dom.data('player')) {
             
             // Extract the player reference
-            self.p = dom.data('player');
+            self.p = dom.data('player').p;
           
             // Register event proxies
             $.each(Player.constants.events, function (key, value) {
@@ -703,13 +707,13 @@
             self.p = new YT.Player(options.id, options);
   
             // Store a player reference
-            dom.data('player', self.p);
+            dom.data('player', self);
           }
           
         }
         catch (error) {
           // console.log('Failed to load YouTube player: ', error);
-          dom.insert('Failed to load YouTube player: ' + error.toString());
+          dom.append('Failed to load YouTube player: ' + error.toString());
         }
       });
   
@@ -757,13 +761,7 @@
   
   
   
-  // methods exposed by jquery function plugin
-  var methods = {
-    load: Player.load
-  };
-  
-  
-  // the jquery fn plugin
+  // The jQuery fn plugin for playlists/queries
   $.fn.tube = function (args) {
     var element, options;
     
@@ -777,28 +775,67 @@
       }
       
       element = this.first();
+      
       element.data('tube', new Tube(options).load(function (success) {
-        var tube = this, playlist = $(tube.render());
-  
-        // setup on-click handlers to play video
-        $('a[rel]', playlist).click(function (event) {
-          event.preventDefault();        
-          tube.play($(this).attr('rel'));
-        });
+        var tube = this, playlist;
         
-        element.append(playlist);
+        if (tube.options.render) {
+          playlist = $(tube.render());
+  
+          // setup on-click handlers to play video
+          $('a[rel]', playlist).click(function (event) {
+            event.preventDefault();       
+            tube.play($(this).attr('rel'));
+          });
+  
+          element.append(playlist); 
+        }
+        
       }));
+      
     }
     
     return this;
   };
   
-  // a jquery function plugin
-  $.tube = function (command) {
-    var fn = methods[command];
-    return $.isFunction(fn) ? fn.call() : fn;
+  // The jQuery fn plugin for single player instances
+  $.fn.player = function (args) {
+    var element, options, player;
+    
+    if (this.length) {
+      
+      if (typeof args === 'string') {
+        options = $.extend({}, $.player.defaults, { video: args });
+      }
+      else {
+        options = $.extend({}, $.player.defaults, args);
+      }
+      
+      element = this.first();
+      
+      if (element.data('player')) {
+        element.data.player.play(options.video);
+      }
+      else {
+        
+        // TODO generate id in case this element does not have one
+        options.id = element.attr('id');
+              
+        if (options.video) {
+          new Player(options).load(options.video);
+        }      
+      }
+    }
+    
+    return this;
+    
   };
+  
+  $.tube = {};
   
   $.tube.constants = Tube.constants;
   $.tube.defaults = Tube.defaults;
+  
+  $.player = {};
+  $.player.defaults = Player.defaults;
 }(jQuery, window, window.document, '0.0.1'));
