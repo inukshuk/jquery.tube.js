@@ -50,7 +50,13 @@ Tube.defaults = {
   limit: 10,
   key: false,
   render: true,
-	events: []
+	truncate: false,
+	at: '\n', // pattern (truncate)
+	max: 140, // max length (truncate)
+	omission: '…', // omission string (truncate)
+	events: [],
+	load: false, // plugin callback when the playlist data has been loaded
+	complete: false // plugin callback when the playlist html has been rendered
 };
 
 Tube.parameters = {
@@ -242,13 +248,21 @@ Tube.prototype.advance = function (by) {
 	return this.play(this.current + (by || 1));
 };
 
-
+Tube.prototype.render_options = function () {
+	return {
+		truncate: this.options.truncate,
+		at: this.options.at,
+		max: this.options.max,
+		omission: this.options.omission
+	};
+};
 
 /** Returns the video as an HTML string */
 Tube.prototype.render = function () {
-	var templates = this.options.templates;
+	var templates = this.options.templates, options = this.render_options();
 	var elements = $.map(this.videos, function (video, index) {
-		return '<li>' + video.render(templates, index) + '</li>';
+		options.index = index;
+		return '<li>' + video.render(templates, options) + '</li>';
 	});
 	
 	return '<ol>' + elements.join('') + '</ol>';

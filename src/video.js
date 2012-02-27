@@ -23,11 +23,34 @@ Video.templates = {
 	video: '<a href="#{id}" rel="{index}">{title}{thumbnail}{description}<p>{author} – {statistics}</p></a>'
 };
 
+Video.defaults = {
+	truncate: false,
+	at: '\n',
+	max: 140,
+	omission: '…',
+	thumbnail: 1,
+	index: 0
+};
 
 /** Private Functions */
 
-var pad = function (number) {
-	return ('0' + number).slice(-2);
+var truncate = function (text, options) {
+	var offset = text.length, index;
+
+	if (options.at && (index = text.indexOf(options.at)) >= 0) {
+		offset = Math.min(offset, index);
+	}
+
+	if (options.max) {
+		if (options.omission && offset - options.omission.length > options.max) {
+			return text.slice(0, options.max - options.omission.length) + options.omission;
+		}
+		else {
+			return text.slice(0, Math.min(options.max, offset));
+		}
+	}
+	
+	return text.slice(0, offset);
 };
 
 
@@ -100,36 +123,37 @@ Video.prototype.duration = function () {
 		return '';
 	}
 	
-	var h = this.hours(), m = this.minutes(), s = this.seconds();
+	var h = this.hours(), m = this.minutes(), s = this.seconds(),
+		pad = function (num) { return ('0' + num).slice(-2); };
+
+	
 	return (h ? [h, pad(m), pad(s)] : [m, pad(s)]).join(':');
 };
 
 /** Returns the image as a property hash (used by the templates) */
-Video.prototype.properties = function (index) {
-  var thumb = this.thumbnails[1] || this.thumbnails[0];
-  
+Video.prototype.properties = function (options) {
   return {
     id: this.id,
-    index: index,
+    index: options.index,
     title: this.title,
     duration: this.duration(),
-    description: this.description,
+    description: options.truncate ? truncate(this.description, options) : this.description,
     author: this.author.name,
     author_url: this.author.url,
     views: this.statistics.views,
     favorites: this.statistics.favorites,
-    url: thumb.url
+    url: this.thumbnails[options.thumbnail].url
   };
 };
 
 /** Returns the video as an HTML string */
-Video.prototype.render = function (templates, index) {
-  var properties = this.properties(index);
+Video.prototype.render = function (templates, options) {
+  var properties = this.properties($.extend({}, Video.defaults, options));
   templates = templates || Video.templates;
   
 	return templates.video.supplant({
 	  id: this.id,
-	  index: index,
+	  index: options.index,
 		title: Video.templates.title.supplant(properties),
 		thumbnail: Video.templates.thumbnail.supplant(properties),
 		description: Video.templates.description.supplant(properties),

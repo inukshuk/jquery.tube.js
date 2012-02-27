@@ -26,7 +26,16 @@ $.fn.tube = function (args) {
           tube.play($(this).attr('rel'));
         });
 
+				if ($.isFunction(tube.options.load)) {
+					tube.options.load.apply(tube, ['load', playlist, element]);
+				}
+				
         element.append(playlist); 
+
+				if ($.isFunction(tube.options.complete)) {
+					tube.options.load.apply(tube, ['complete', playlist, element]);
+				}
+
       }
       
     }));

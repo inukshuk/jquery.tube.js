@@ -136,11 +136,34 @@
     video: '<a href="#{id}" rel="{index}">{title}{thumbnail}{description}<p>{author} – {statistics}</p></a>'
   };
   
+  Video.defaults = {
+    truncate: false,
+    at: '\n',
+    max: 140,
+    omission: '…',
+    thumbnail: 1,
+    index: 0
+  };
   
   /** Private Functions */
   
-  var pad = function (number) {
-    return ('0' + number).slice(-2);
+  var truncate = function (text, options) {
+    var offset = text.length, index;
+  
+    if (options.at && (index = text.indexOf(options.at)) >= 0) {
+      offset = Math.min(offset, index);
+    }
+  
+    if (options.max) {
+      if (options.omission && offset - options.omission.length > options.max) {
+        return text.slice(0, options.max - options.omission.length) + options.omission;
+      }
+      else {
+        return text.slice(0, Math.min(options.max, offset));
+      }
+    }
+    
+    return text.slice(0, offset);
   };
   
   
@@ -213,36 +236,37 @@
       return '';
     }
     
-    var h = this.hours(), m = this.minutes(), s = this.seconds();
+    var h = this.hours(), m = this.minutes(), s = this.seconds(),
+      pad = function (num) { return ('0' + num).slice(-2); };
+  
+    
     return (h ? [h, pad(m), pad(s)] : [m, pad(s)]).join(':');
   };
   
   /** Returns the image as a property hash (used by the templates) */
-  Video.prototype.properties = function (index) {
-    var thumb = this.thumbnails[1] || this.thumbnails[0];
-    
+  Video.prototype.properties = function (options) {
     return {
       id: this.id,
-      index: index,
+      index: options.index,
       title: this.title,
       duration: this.duration(),
-      description: this.description,
+      description: options.truncate ? truncate(this.description, options) : this.description,
       author: this.author.name,
       author_url: this.author.url,
       views: this.statistics.views,
       favorites: this.statistics.favorites,
-      url: thumb.url
+      url: this.thumbnails[options.thumbnail].url
     };
   };
   
   /** Returns the video as an HTML string */
-  Video.prototype.render = function (templates, index) {
-    var properties = this.properties(index);
+  Video.prototype.render = function (templates, options) {
+    var properties = this.properties($.extend({}, Video.defaults, options));
     templates = templates || Video.templates;
     
     return templates.video.supplant({
       id: this.id,
-      index: index,
+      index: options.index,
       title: Video.templates.title.supplant(properties),
       thumbnail: Video.templates.thumbnail.supplant(properties),
       description: Video.templates.description.supplant(properties),
@@ -305,7 +329,13 @@
     limit: 10,
     key: false,
     render: true,
-    events: []
+    truncate: false,
+    at: '\n', // pattern (truncate)
+    max: 140, // max length (truncate)
+    omission: '…', // omission string (truncate)
+    events: [],
+    load: false, // plugin callback when the playlist data has been loaded
+    complete: false // plugin callback when the playlist html has been rendered
   };
   
   Tube.parameters = {
@@ -497,13 +527,21 @@
     return this.play(this.current + (by || 1));
   };
   
-  
+  Tube.prototype.render_options = function () {
+    return {
+      truncate: this.options.truncate,
+      at: this.options.at,
+      max: this.options.max,
+      omission: this.options.omission
+    };
+  };
   
   /** Returns the video as an HTML string */
   Tube.prototype.render = function () {
-    var templates = this.options.templates;
+    var templates = this.options.templates, options = this.render_options();
     var elements = $.map(this.videos, function (video, index) {
-      return '<li>' + video.render(templates, index) + '</li>';
+      options.index = index;
+      return '<li>' + video.render(templates, options) + '</li>';
     });
     
     return '<ol>' + elements.join('') + '</ol>';
@@ -660,6 +698,8 @@
       if (typeof YT === 'undefined') {
         var tag = document.createElement('script');
       
+        // NB: possible race condition if multiple player instances are loaded
+        // at the same time.  
         window.onYouTubePlayerAPIReady = function () {
           if ($.isFunction(callback)) {
             callback.call();
@@ -788,7 +828,16 @@
             tube.play($(this).attr('rel'));
           });
   
+          if ($.isFunction(tube.options.load)) {
+            tube.options.load.apply(tube, ['load', playlist, element]);
+          }
+          
           element.append(playlist); 
+  
+          if ($.isFunction(tube.options.complete)) {
+            tube.options.load.apply(tube, ['complete', playlist, element]);
+          }
+  
         }
         
       }));
