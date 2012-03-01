@@ -61,7 +61,8 @@ Player.defaults = {
     autoplay: 0,
     controls: 1,
     enablejsapi: 1,
-    loop: 0
+    loop: 0,
+    wmode: 'opaque'
   }
 };
 
