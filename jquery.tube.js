@@ -606,13 +606,14 @@
     id: 'player',
     width: 640,
     height: 360,
+    wmode: 'opaque',
     playerVars: {
       autohide: 2, // 0 = always visible, 1 = hide progress bar and controls, 2 = hide progress bar
       autoplay: 0,
       controls: 1,
       enablejsapi: 1,
       loop: 0,
-      wmode: 'opaque'
+      modestbranding: 1
     }
   };
   
