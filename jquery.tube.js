@@ -410,8 +410,6 @@
         });
         
         
-        // TODO check if player already exists for the DOM target and reuse it
-        
         if (success && (self.options.autoload || self.options.start)) {
           self.current = Math.min(self.videos.length - 1, Math.max(0, self.options.start - 1));
           self.player.load(self.videos[self.current]);
@@ -751,9 +749,11 @@
               self.p.addEventListener(key, self.event_proxy_for(value));
             });
             
-            // If load was called with a video, play the video right away
-            if (video) {
-              self.p.play(video);
+            // If load was called with a video, play the video right away.
+            // Make sure we actually have both video and p to prohibit cricular
+            // call.
+            if (video && self.p) {
+              self.play(video);
             }
           }
           else {

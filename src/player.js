@@ -192,9 +192,11 @@ if ($.isFunction(window.postMessage)) {
             self.p.addEventListener(key, self.event_proxy_for(value));
           });
           
-          // If load was called with a video, play the video right away
-          if (video) {
-            self.p.play(video);
+          // If load was called with a video, play the video right away.
+					// Make sure we actually have both video and p to prohibit cricular
+					// call.
+          if (video && self.p) {
+            self.play(video);
           }
         }
         else {
