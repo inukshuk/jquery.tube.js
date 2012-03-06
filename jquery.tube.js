@@ -626,6 +626,10 @@
     }
   };
   
+  Player.callbacks = [];
+  
+  Player.semaphore = 0;
+  
   Player.events = ['unstarted', 'end', 'play', 'cue', 'buffer', 'pause', 'error'];
   
   /** Instance Methods */
@@ -706,15 +710,18 @@
     };
     
     Player.load = function (callback) {
-      if (typeof YT === 'undefined') {
+      if (typeof YT === 'undefined') {      
         var tag = document.createElement('script');
       
         if ($.isFunction(callback)) {
-          window.onYouTubePlayerAPIReady.callbacks.push(callback);
+          Player.callbacks.push(callback);
         }
   
-        tag.src = Player.constants.api;
-        $('script:first').before(tag);
+        // Use semaphore to make sure we load the API just once
+        if (Player.semaphore++) {
+          tag.src = Player.constants.api;
+          $('script:first').before(tag);        
+        }
   
         return false;
       }
@@ -731,7 +738,7 @@
         dom = $('#' + options.id);
   
       Player.load(function () {
-        try {
+        // try {
           
           // Check whether or not a Player instance already exists
           if (dom.data('player')) {
@@ -744,6 +751,10 @@
               self.p.addEventListener(key, self.event_proxy_for(value));
             });
             
+            // If load was called with a video, play the video right away
+            if (video) {
+              self.p.play(video);
+            }
           }
           else {
             // Map YouTube native events to our own events
@@ -751,17 +762,24 @@
               options.events[key] = self.event_proxy_for(value);
             });
   
-            self.p = new YT.Player(options.id, options);
+            // WORKAROUND: this sometimes fails initially when using multiple
+            // players on a page. Race-condition?
+            try {
+              self.p = new YT.Player(options.id, options);
+            }
+            catch (error) {
+              self.p = new YT.Player(options.id, options);
+            }
   
             // Store a player reference
             dom.data('player', self);
           }
           
-        }
-        catch (error) {
-          // console.log('Failed to load YouTube player: ', error);
-          dom.append('Failed to load YouTube player: ' + error.toString());
-        }
+        // }
+        // catch (error) {
+        //   // console.log('Failed to load YouTube player: ', error);
+        //   dom.append('Failed to load YouTube player: ' + error.toString());
+        // }
       });
   
       return this;
@@ -807,12 +825,11 @@
   
   // YouTube API's initial callback
   window.onYouTubePlayerAPIReady = function () {
-    $.each(window.onYouTubePlayerAPIReady.callbacks, function () {
+    $.each(Player.callbacks, function () {
       this.call();
     });
   };
   
-  window.onYouTubePlayerAPIReady.callbacks = [];
   
   
   // The jQuery fn plugin for playlists/queries
