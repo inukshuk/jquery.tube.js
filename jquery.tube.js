@@ -335,7 +335,8 @@
     omission: '…', // omission string (truncate)
     events: [],
     load: false, // plugin callback when the playlist data has been loaded
-    complete: false // plugin callback when the playlist html has been rendered
+    complete: false, // plugin callback when the playlist html has been rendered
+    click: false // plugin callback
   };
   
   Tube.parameters = {
@@ -450,6 +451,11 @@
       }
     });
     
+    // adapt playlist specific parameters
+    if (this.options.playlist) {
+      delete parameters.orderby;
+    }
+  
     parameters.alt      = 'json-in-script';
     parameters.callback = '?';
   
@@ -528,12 +534,15 @@
   };
   
   Tube.prototype.render_options = function () {
-    return {
-      truncate: this.options.truncate,
-      at: this.options.at,
-      max: this.options.max,
-      omission: this.options.omission
-    };
+    var options = {}, self = this;
+    
+    $.each(Video.defaults, function (name) {
+      if (self.options[name]) {
+        options[name] = self.options[name];
+      }
+    });
+    
+    return options;
   };
   
   /** Returns the video as an HTML string */
@@ -700,13 +709,9 @@
       if (typeof YT === 'undefined') {
         var tag = document.createElement('script');
       
-        // NB: possible race condition if multiple player instances are loaded
-        // at the same time.  
-        window.onYouTubePlayerAPIReady = function () {
-          if ($.isFunction(callback)) {
-            callback.call();
-          }
-        };
+        if ($.isFunction(callback)) {
+          window.onYouTubePlayerAPIReady.callbacks.push(callback);
+        }
   
         tag.src = Player.constants.api;
         $('script:first').before(tag);
@@ -800,7 +805,14 @@
     
   }
   
+  // YouTube API's initial callback
+  window.onYouTubePlayerAPIReady = function () {
+    $.each(window.onYouTubePlayerAPIReady.callbacks, function () {
+      this.call();
+    });
+  };
   
+  window.onYouTubePlayerAPIReady.callbacks = [];
   
   
   // The jQuery fn plugin for playlists/queries
@@ -826,7 +838,9 @@
   
           // setup on-click handlers to play video
           $('a[rel]', playlist).click(function (event) {
-            event.preventDefault();       
+            if ($.isFunction(tube.options.click)) {
+              tube.options.click.apply(tube, ['click', this, event]);
+            }
             tube.play($(this).attr('rel'));
           });
   
@@ -837,7 +851,7 @@
           element.append(playlist); 
   
           if ($.isFunction(tube.options.complete)) {
-            tube.options.load.apply(tube, ['complete', playlist, element]);
+            tube.options.complete.apply(tube, ['complete', playlist, element]);
           }
   
         }

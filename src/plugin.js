@@ -22,7 +22,9 @@ $.fn.tube = function (args) {
 
         // setup on-click handlers to play video
         $('a[rel]', playlist).click(function (event) {
-          event.preventDefault();       
+					if ($.isFunction(tube.options.click)) {
+						tube.options.click.apply(tube, ['click', this, event]);
+					}
           tube.play($(this).attr('rel'));
         });
 
@@ -33,7 +35,7 @@ $.fn.tube = function (args) {
         element.append(playlist); 
 
 				if ($.isFunction(tube.options.complete)) {
-					tube.options.load.apply(tube, ['complete', playlist, element]);
+					tube.options.complete.apply(tube, ['complete', playlist, element]);
 				}
 
       }

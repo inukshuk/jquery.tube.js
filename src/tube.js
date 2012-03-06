@@ -56,7 +56,8 @@ Tube.defaults = {
 	omission: '…', // omission string (truncate)
 	events: [],
 	load: false, // plugin callback when the playlist data has been loaded
-	complete: false // plugin callback when the playlist html has been rendered
+	complete: false, // plugin callback when the playlist html has been rendered
+	click: false // plugin callback
 };
 
 Tube.parameters = {
@@ -171,6 +172,11 @@ Tube.prototype.parameters = function () {
     }
   });
   
+  // adapt playlist specific parameters
+  if (this.options.playlist) {
+		delete parameters.orderby;
+  }
+
   parameters.alt      = 'json-in-script';
   parameters.callback = '?';
 
@@ -249,12 +255,15 @@ Tube.prototype.advance = function (by) {
 };
 
 Tube.prototype.render_options = function () {
-	return {
-		truncate: this.options.truncate,
-		at: this.options.at,
-		max: this.options.max,
-		omission: this.options.omission
-	};
+	var options = {}, self = this;
+	
+	$.each(Video.defaults, function (name) {
+		if (self.options[name]) {
+			options[name] = self.options[name];
+		}
+	});
+	
+	return options;
 };
 
 /** Returns the video as an HTML string */
