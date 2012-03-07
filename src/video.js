@@ -59,10 +59,6 @@ var truncate = function (text, options) {
 /** Parses a YouTube JSON element */
 Video.prototype.parse = function (json) {
 	try {
-		if (json.id) {
-			this.id = json.id.$t.match(/\/([^\/]*)$/)[1];
-		}
-	
 		if (json.author && $.isArray(json.author)) {
 			this.author = { 
 				name: json.author[0].name.$t,
@@ -83,6 +79,11 @@ Video.prototype.parse = function (json) {
 		if (json.media$group) {
 			var media = json.media$group;
 
+			// Overrides json.id
+			if (media.yt$videoid) {
+				this.id = media.yt$videoid.$t;
+			}
+			
 			if (media.media$description) {
 				this.description = media.media$description.$t;
 			}

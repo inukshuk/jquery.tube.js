@@ -67,7 +67,7 @@ Tube.parameters = {
   'format': 'format',
   'orderby': 'order',
   'author': 'author',
-  'version': 'v'
+  'v': 'version'
 };
 
 Tube.events = ['load', 'ready', 'stop', 'error'];

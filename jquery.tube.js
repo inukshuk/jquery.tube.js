@@ -171,11 +171,7 @@
   
   /** Parses a YouTube JSON element */
   Video.prototype.parse = function (json) {
-    try {
-      if (json.id) {
-        this.id = json.id.$t.match(/\/([^\/]*)$/)[1];
-      }
-    
+    // try {
       if (json.author && $.isArray(json.author)) {
         this.author = { 
           name: json.author[0].name.$t,
@@ -196,6 +192,11 @@
       if (json.media$group) {
         var media = json.media$group;
   
+        // Overrides json.id
+        if (media.yt$videoid) {
+          this.id = media.yt$videoid.$t;
+        }
+        
         if (media.media$description) {
           this.description = media.media$description.$t;
         }
@@ -210,10 +211,10 @@
           });
         } 
       }
-    }
-    catch (error) {
-      console.log(error);
-    }
+    // }
+    // catch (error) {
+    //   console.log(error);
+    // }
     
     return this;
   };
@@ -346,7 +347,7 @@
     'format': 'format',
     'orderby': 'order',
     'author': 'author',
-    'version': 'v'
+    'v': 'version'
   };
   
   Tube.events = ['load', 'ready', 'stop', 'error'];
@@ -851,28 +852,36 @@
       
       element.data('tube', new Tube(options).load(function (success) {
         var tube = this, playlist;
-        
-        if (tube.options.render) {
-          playlist = $(tube.render());
   
-          // setup on-click handlers to play video
-          $('a[rel]', playlist).click(function (event) {
-            if ($.isFunction(tube.options.click)) {
-              tube.options.click.apply(tube, ['click', this, event]);
+        if (success) {
+          if (tube.options.render) {
+            playlist = $(tube.render());
+  
+            // setup on-click handlers to play video
+            $('a[rel]', playlist).click(function (event) {
+              if ($.isFunction(tube.options.click)) {
+                tube.options.click.apply(tube, ['click', this, event]);
+              }
+              tube.play($(this).attr('rel'));
+            });
+  
+            if ($.isFunction(tube.options.load)) {
+              tube.options.load.apply(tube, ['load', playlist, element]);
             }
-            tube.play($(this).attr('rel'));
-          });
-  
-          if ($.isFunction(tube.options.load)) {
-            tube.options.load.apply(tube, ['load', playlist, element]);
-          }
           
-          element.append(playlist); 
-  
+            element.append(playlist); 
+    
+          }
+    
           if ($.isFunction(tube.options.complete)) {
             tube.options.complete.apply(tube, ['complete', playlist, element]);
           }
-  
+    
+        }
+        else {
+          if ($.isFunction(tube.options.complete)) {
+            tube.options.complete.apply(tube, ['error', playlist, element]);
+          }
         }
         
       }));
