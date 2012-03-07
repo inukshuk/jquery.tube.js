@@ -349,7 +349,7 @@
     'version': 'v'
   };
   
-  Tube.events = ['load', 'ready', 'stop'];
+  Tube.events = ['load', 'ready', 'stop', 'error'];
   
   
   /** Static Tube Functions */
@@ -403,25 +403,34 @@
       var self = this, success = 0;
   
       $.getJSON(this.request(), function (data) {
-        success = data.feed.entry.length;
+        try {
+          success = data.feed.entry.length;
   
-        self.videos = $.map(data.feed.entry, function(item) {
-          return new Video().parse(item);
-        });
+          self.videos = $.map(data.feed.entry, function(item) {
+            return new Video().parse(item);
+          });
         
         
-        if (success && (self.options.autoload || self.options.start)) {
-          self.current = Math.min(self.videos.length - 1, Math.max(0, self.options.start - 1));
-          self.player.load(self.videos[self.current]);
+          if (success && (self.options.autoload || self.options.start)) {
+            self.current = Math.min(self.videos.length - 1, Math.max(0, self.options.start - 1));
+            self.player.load(self.videos[self.current]);
+          }
+  
+          self.notify('load');
+        
+          if (callback && $.isFunction(callback)) {  
+            callback.apply(self, [success]);
+          }
+  
+          self.notify('ready');
         }
+        catch (error) {
+          if (callback && $.isFunction(callback)) {  
+            callback.apply(self, [0, error]);
+          }
   
-        self.notify('load');
-        
-        if (callback && $.isFunction(callback)) {  
-          callback.apply(self, [success]);
+          self.notify('error');        
         }
-  
-        self.notify('ready');
       });
       
       return this;

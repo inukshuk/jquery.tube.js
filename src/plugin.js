@@ -16,29 +16,37 @@ $.fn.tube = function (args) {
     
     element.data('tube', new Tube(options).load(function (success) {
       var tube = this, playlist;
-      
-      if (tube.options.render) {
-        playlist = $(tube.render());
 
-        // setup on-click handlers to play video
-        $('a[rel]', playlist).click(function (event) {
-					if ($.isFunction(tube.options.click)) {
-						tube.options.click.apply(tube, ['click', this, event]);
+			if (success) {
+	      if (tube.options.render) {
+	        playlist = $(tube.render());
+
+	        // setup on-click handlers to play video
+	        $('a[rel]', playlist).click(function (event) {
+						if ($.isFunction(tube.options.click)) {
+							tube.options.click.apply(tube, ['click', this, event]);
+						}
+	          tube.play($(this).attr('rel'));
+	        });
+
+					if ($.isFunction(tube.options.load)) {
+						tube.options.load.apply(tube, ['load', playlist, element]);
 					}
-          tube.play($(this).attr('rel'));
-        });
-
-				if ($.isFunction(tube.options.load)) {
-					tube.options.load.apply(tube, ['load', playlist, element]);
-				}
 				
-        element.append(playlist); 
-
+	        element.append(playlist); 
+	
+	      }
+	
 				if ($.isFunction(tube.options.complete)) {
 					tube.options.complete.apply(tube, ['complete', playlist, element]);
 				}
-
-      }
+	
+			}
+			else {
+				if ($.isFunction(tube.options.complete)) {
+					tube.options.complete.apply(tube, ['error', playlist, element]);
+				}
+			}
       
     }));
     
