@@ -141,7 +141,7 @@
     at: '\n',
     max: 140,
     omission: '…',
-    thumbnail: 1,
+    thumbnail: 0,
     index: 0
   };
   
@@ -171,7 +171,7 @@
   
   /** Parses a YouTube JSON element */
   Video.prototype.parse = function (json) {
-    // try {
+    try {
       if (json.author && $.isArray(json.author)) {
         this.author = { 
           name: json.author[0].name.$t,
@@ -211,10 +211,10 @@
           });
         } 
       }
-    // }
-    // catch (error) {
-    //   console.log(error);
-    // }
+    }
+    catch (error) {
+      console.log(error);
+    }
     
     return this;
   };

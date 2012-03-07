@@ -28,7 +28,7 @@ Video.defaults = {
 	at: '\n',
 	max: 140,
 	omission: '…',
-	thumbnail: 1,
+	thumbnail: 0,
 	index: 0
 };
 
