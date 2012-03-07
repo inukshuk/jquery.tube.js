@@ -159,7 +159,9 @@ if ($.isFunction(window.postMessage)) {
       }
 
 			// Use semaphore to make sure we load the API just once
-			if (Player.semaphore++) {
+			if (Player.semaphore === 0) {
+				Player.semaphore = 1;
+				
 	      tag.src = Player.constants.api;
 	      $('script:first').before(tag);				
 			}
@@ -179,7 +181,7 @@ if ($.isFunction(window.postMessage)) {
       dom = $('#' + options.id);
 
     Player.load(function () {
-      // try {
+      try {
         
         // Check whether or not a Player instance already exists
         if (dom.data('player')) {
@@ -205,24 +207,17 @@ if ($.isFunction(window.postMessage)) {
             options.events[key] = self.event_proxy_for(value);
           });
 
-					// WORKAROUND: this sometimes fails initially when using multiple
-					// players on a page. Race-condition?
-					try {
-	          self.p = new YT.Player(options.id, options);
-					}
-					catch (error) {
-						self.p = new YT.Player(options.id, options);
-					}
+          self.p = new YT.Player(options.id, options);
 
           // Store a player reference
           dom.data('player', self);
         }
         
-      // }
-      // catch (error) {
-      //   // console.log('Failed to load YouTube player: ', error);
-      //   dom.append('Failed to load YouTube player: ' + error.toString());
-      // }
+      }
+      catch (error) {
+        // console.log('Failed to load YouTube player: ', error);
+        dom.append('Failed to load YouTube player: ' + error.toString());
+      }
     });
 
     return this;

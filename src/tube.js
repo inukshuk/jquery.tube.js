@@ -174,6 +174,9 @@ Tube.prototype.parameters = function () {
   if (this.options.playlist) {
 		delete parameters.orderby;
   }
+	else if (this.options.user) {
+		parameters.orderby = 'published';
+	}
 
   parameters.alt      = 'json-in-script';
   parameters.callback = '?';
@@ -189,8 +192,11 @@ Tube.prototype.request = function (options) {
 
   // distinguish between playlist selection and video query
   if (this.options.playlist) {
-    api += 'playlists/' + this.options.playlist;
+    api += 'playlists/' + this.options.playlist.replace(/^PL/, '');
   }
+	else if (this.options.user) {
+    api += ['users', this.options.user, 'uploads'].join('/');		
+	}
   else {
     api += 'videos';
   }
@@ -252,16 +258,8 @@ Tube.prototype.advance = function (by) {
 	return this.play(this.current + (by || 1));
 };
 
-Tube.prototype.render_options = function () {
-	var options = {}, self = this;
-	
-	$.each(Video.defaults, function (name) {
-		if (self.options[name]) {
-			options[name] = self.options[name];
-		}
-	});
-	
-	return options;
+Tube.prototype.render_options = function (options) {
+	return $.extend({}, Video.defaults, this.options, options || {});
 };
 
 /** Returns the video as an HTML string */

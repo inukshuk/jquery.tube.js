@@ -453,6 +453,9 @@
     if (this.options.playlist) {
       delete parameters.orderby;
     }
+    else if (this.options.user) {
+      parameters.orderby = 'published';
+    }
   
     parameters.alt      = 'json-in-script';
     parameters.callback = '?';
@@ -468,7 +471,10 @@
   
     // distinguish between playlist selection and video query
     if (this.options.playlist) {
-      api += 'playlists/' + this.options.playlist;
+      api += 'playlists/' + this.options.playlist.replace(/^PL/, '');
+    }
+    else if (this.options.user) {
+      api += ['users', this.options.user, 'uploads'].join('/');    
     }
     else {
       api += 'videos';
@@ -531,16 +537,8 @@
     return this.play(this.current + (by || 1));
   };
   
-  Tube.prototype.render_options = function () {
-    var options = {}, self = this;
-    
-    $.each(Video.defaults, function (name) {
-      if (self.options[name]) {
-        options[name] = self.options[name];
-      }
-    });
-    
-    return options;
+  Tube.prototype.render_options = function (options) {
+    return $.extend({}, Video.defaults, this.options, options || {});
   };
   
   /** Returns the video as an HTML string */
@@ -716,7 +714,9 @@
         }
   
         // Use semaphore to make sure we load the API just once
-        if (Player.semaphore++) {
+        if (Player.semaphore === 0) {
+          Player.semaphore = 1;
+          
           tag.src = Player.constants.api;
           $('script:first').before(tag);        
         }
@@ -736,7 +736,7 @@
         dom = $('#' + options.id);
   
       Player.load(function () {
-        // try {
+        try {
           
           // Check whether or not a Player instance already exists
           if (dom.data('player')) {
@@ -762,24 +762,17 @@
               options.events[key] = self.event_proxy_for(value);
             });
   
-            // WORKAROUND: this sometimes fails initially when using multiple
-            // players on a page. Race-condition?
-            try {
-              self.p = new YT.Player(options.id, options);
-            }
-            catch (error) {
-              self.p = new YT.Player(options.id, options);
-            }
+            self.p = new YT.Player(options.id, options);
   
             // Store a player reference
             dom.data('player', self);
           }
           
-        // }
-        // catch (error) {
-        //   // console.log('Failed to load YouTube player: ', error);
-        //   dom.append('Failed to load YouTube player: ' + error.toString());
-        // }
+        }
+        catch (error) {
+          // console.log('Failed to load YouTube player: ', error);
+          dom.append('Failed to load YouTube player: ' + error.toString());
+        }
       });
   
       return this;

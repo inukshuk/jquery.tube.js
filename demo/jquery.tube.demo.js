@@ -8,13 +8,13 @@
 		
 		$('#player-1').player('A6t9Vn7-9eU');
 		
-	  $('#tube-1').tube({ player: 'player-2', query: 'ctbto', autoplay: true, limit: 5, start: 3, controls: 1, hide: 1,
+	  $('#tube-1').tube({ player: 'player-2', user: 'CTBTO', thumbnail: 0, autoplay: true, limit: 5, start: 3, controls: 1, hide: 1,
 	    events: { load: event_handler, play: event_handler, pause: event_handler,
 	    stop: event_handler, end: event_handler, ready: event_handler }, truncate: true,
 	    templates: { description: '<p>Description:</p><p>{description}</p>' }
     });
 
-    $('#tube-2').tube({ player: 'player-2', query: 'united nations', autoplay: true, limit: 3,
+    $('#tube-2').tube({ player: 'player-2', playlist: 'PL6EAA9FF571B3BFEE', autoplay: true, limit: 3,
       events: { load: event_handler, play: event_handler, pause: event_handler,
       stop: event_handler, end: event_handler, ready: event_handler }
     });
