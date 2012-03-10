@@ -6,7 +6,7 @@
 	
 	$(function () {
 		
-		$('#player-1').player('A6t9Vn7-9eU');
+		$('#player-1').player({ video: 'A6t9Vn7-9eU', events: { play: event_handler, pause: event_handler } });
 		
 	  $('#tube-1').tube({ player: 'player-2', user: 'CTBTO', thumbnail: 0, autoplay: true, limit: 5, start: 3, controls: 1, hide: 1,
 	    events: { load: event_handler, play: event_handler, pause: event_handler,
