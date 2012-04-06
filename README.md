@@ -8,7 +8,8 @@ playlist, user's feed or a search query; a tube offers the basic control and
 event handling interfaces you would expect from a playlist (play, pause, next,
 etc.) and is associated with a player instance. A player is a thin wrapper
 around YouTube's iFrame or (if window.pushMessage is unavailable) JavaScript
-player API.
+player API; thus, the player is intended to work transparently on legacy
+browsers (IE7) and modern HTML5 capable devices without Flash support.
 
 This plugin contains no stylesheets; tube instances create simple HTML
 lists of their contents (the structure can be adjusted for each instance

@@ -598,31 +598,31 @@
   
     // Handle YouTube's state change events and dispatch using our taxonomy
     this.on('state', function (name, event) {
-      if (event) {
-        switch (event.data) {
-          case -1:
-            this.notify('unstarted');
-            break;
-          case YT.PlayerState.ENDED:
-            this.notify('end');
-            break;
-          case YT.PlayerState.PLAYING:
-            this.notify('play');
-            break;
-          case YT.PlayerState.PAUSED:
-            this.notify('pause');
-            break;
-          case YT.PlayerState.BUFFERING:
-            this.notify('buffer');
-            break;
-          case YT.PlayerState.CUED:
-            this.notify('cue');
-            break;
+      var state = $.isNumeric(event) ? event : (event && event.data);
+      
+       switch (state) {
+         case -1:
+           this.notify('unstarted');
+           break;
+         case 0:
+           this.notify('end');
+           break;
+         case 1:
+           this.notify('play');
+           break;
+         case 2:
+           this.notify('pause');
+           break;
+         case 3:
+           this.notify('buffer');
+           break;
+         case 5:
+           this.notify('cue');
+           break;
   
-          default:
-          // ignore
-        }
-      }
+         default:
+         // ignore
+       }
     });
     
     // Register event handlers set in options
@@ -654,7 +654,7 @@
   Player.defaults = {
     id: 'player',
     width: 640,
-    height: 360,
+    height: 390,
     wmode: 'opaque',
     events: {},
     playerVars: {
@@ -725,12 +725,6 @@
   };
   
   
-  
-  
-  Player.prototype.event_proxy_for = function (event) {
-    return $.proxy(this.notify, this, event);
-  };
-  
   /** API Dependent Methods */
   
   // TODO change switch to improve testability
@@ -742,6 +736,12 @@
     
     Player.api = 'iframe';
     Player.constants.api = '//www.youtube.com/player_api';
+  
+  
+    Player.prototype.event_proxy_for = function (event) {
+      return $.proxy(this.notify, this, event);
+    };
+  
     
     Player.load = function (callback) {
       if (typeof YT === 'undefined') {
@@ -834,6 +834,22 @@
     Player.constants.api = '//www.youtube.com/v/{video}?enablejsapi=1&playerapiid={id}&version=3';
     Player.constants.swf_version = '8';
   
+    // Workaround:
+    // The JavaScript API can register event handlers only as strings. Therefore,
+    // we need to set up a global proxy for each player instance.
+    Player.prototype.event_proxy_for = function (event) {
+      var self = this, id = this.options.id.replace(/[\s-]/g, '_'),
+        proxy = ['event_proxy_for_player', id, event].join('_');
+  
+      window[proxy] = function () {
+        var args = Array.prototype.slice.apply(arguments);
+        
+        args.unshift(event);
+        self.notify.apply(self, args);
+      };      
+      
+      return proxy;
+    };
   
     Player.load = function (callback) {
       if (typeof swfobject === 'undefined') {
@@ -854,7 +870,6 @@
   
       return true;
     };
-      
     
     Player.prototype.load = function (video) {
       var self = this, options = $.extend({}, this.options, { videoId: video.id || video, events: {} }),
@@ -883,13 +898,13 @@
           }
           else {
   
-            // Map YouTube native events to our own events
-            $.each(Player.constants.events, function (key, value) {
-              options.events[key] = self.event_proxy_for(value);
-            });
-  
             Player.callbacks.push(function (id) {
               self.p = document.getElementById(id);
+  
+              // Register event proxies
+              $.each(Player.constants.events, function (key, value) {
+                self.p.addEventListener(key, self.event_proxy_for(value));  
+              });
   
               // Store a player reference
               dom.data('player', self);
@@ -903,7 +918,7 @@
               Player.constants.swf_version,
               null,
               options.playerVars,
-              { allowScriptAccess: 'always' },
+              { allowScriptAccess: 'always', wmode: 'opaque' },
               { id: options.id }
             );
   
