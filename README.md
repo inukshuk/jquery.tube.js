@@ -3,10 +3,10 @@ jquery.tube.js
 
 Tube is a jQuery plugin to access YouTube's player and data APIs
 transparently. The basic approach is centered around 'tube' objects: a
-tube is an abstract container that contains videos based on a YouTube
-playlist or a search query; a tube offers the basic control and event
-handling interface you would expect from a playlist (play, pause, next,
-etc.) and is associated with a player instance. A player is thin wrapper
+tube is an abstract container filled with videos based on a YouTube
+playlist, user's feed or a search query; a tube offers the basic control and
+event handling interfaces you would expect from a playlist (play, pause, next,
+etc.) and is associated with a player instance. A player is a thin wrapper
 around YouTube's iFrame or (if window.pushMessage is unavailable) JavaScript
 player API.
 
