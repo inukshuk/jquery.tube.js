@@ -5,7 +5,7 @@
 
 var Player = function (options) {
   var self = this;
-  
+
   this.options = $.extend({}, Player.defaults, options);
   this.p = null;
 
@@ -101,8 +101,8 @@ Player.prototype.play = function (video) {
     return this.load(video);
   }
 
-  if (video) {    
-    this.p.loadVideoById(video.id || video, 0, this.options.quality);    
+  if (video) {
+    this.p.loadVideoById(video.id || video, 0, this.options.quality);
   }
   else {
     this.p.playVideo();
@@ -151,7 +151,7 @@ Player.prototype.event_proxy_for = function (event) {
 
 // TODO change switch to improve testability
 
-if ($.isFunction(window.postMessage) && !$.browser.msie) {
+if ($.isFunction(window.postMessage)) {
 
   // Use the iFrame API
   // https://code.google.com/apis/youtube/iframe_api_reference.html
@@ -160,7 +160,7 @@ if ($.isFunction(window.postMessage) && !$.browser.msie) {
   Player.constants.api = '//www.youtube.com/player_api';
   
   Player.load = function (callback) {
-    if (typeof YT === 'undefined') {			
+    if (typeof YT === 'undefined') {
       var tag = document.createElement('script');
     
       if ($.isFunction(callback)) {
@@ -172,7 +172,7 @@ if ($.isFunction(window.postMessage) && !$.browser.msie) {
 				Player.semaphore = 1;
 				
 	      tag.src = Player.constants.api;
-	      $('script:first').before(tag);				
+	      $('script:first').before(tag);
 			}
 
       return false;
@@ -253,20 +253,17 @@ else {
 
   Player.load = function (callback) {
     if (typeof swfobject === 'undefined') {
-      var tag = document.createElement('script');
-
-      $(tag).load(function () {
+				
+			$.getScript(Player.constants.swfobject, function () {
         if ($.isFunction(callback)) {
           callback.call();
-        }     
-      });
-
-      tag.src = Player.constants.swfobject;
-      $('script:first').before(tag);
-  
+        }
+			});
+	  
       return false;
     }
-    
+  
+  	// Execute the callback (non-blocking)
     if ($.isFunction(callback)) {
       setTimeout(callback, 0);
     }     
@@ -301,6 +298,7 @@ else {
           }
         }
         else {
+
           // Map YouTube native events to our own events
           $.each(Player.constants.events, function (key, value) {
             options.events[key] = self.event_proxy_for(value);
@@ -329,8 +327,8 @@ else {
         
       }
       catch (error) {
-        // console.log('Failed to load YouTube player: ', error);
-        dom.append('Failed to load YouTube player: ' + error.toString());
+        console.log('Failed to load YouTube player: ', error);
+        // dom.append('Failed to load YouTube player: ' + error.toString());
       }
     });
 

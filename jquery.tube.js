@@ -111,6 +111,7 @@
     return this;
   };
   
+  /*global $: true, exports: true, console: true */
   
   /** Video Constructor */
   
@@ -162,10 +163,21 @@
         return text.slice(0, Math.min(options.max, offset));
       }
     }
-    
+  
     return text.slice(0, offset);
   };
   
+  var pad = function (num) { return ('0' + num).slice(-2); };
+  
+  var format_date = function (date) {
+    if (date === null) { return ''; }
+    
+    if (typeof date !== 'object') {
+      return date;
+    }
+    
+    return [date.getDate(), date.getMonth(), date.getFullYear()].join('.');
+  };
   
   /** Video Instance Methods */
   
@@ -173,13 +185,13 @@
   Video.prototype.parse = function (json) {
     try {
       if (json.author && $.isArray(json.author)) {
-        this.author = { 
+        this.author = {
           name: json.author[0].name.$t,
           id: json.author[0].uri.$t.match(/\/([^\/]*)$/)[1]
         };
         this.author.url = Video.constants.users.supplant(this.author);
       }
-      
+  
       if (json.yt$statistics) {
         this.statistics.favorites = json.yt$statistics.favoriteCount;
         this.statistics.views = json.yt$statistics.viewCount;
@@ -188,7 +200,7 @@
       if (json.title) {
         this.title = json.title.$t;
       }
-      
+  
       if (json.media$group) {
         var media = json.media$group;
   
@@ -196,26 +208,36 @@
         if (media.yt$videoid) {
           this.id = media.yt$videoid.$t;
         }
-        
+  
         if (media.media$description) {
           this.description = media.media$description.$t;
         }
-        
+  
         if (media.yt$duration) {
           this.duration_in_seconds = parseInt(media.yt$duration.seconds, 10);
         }
-        
+  
+        if (media.yt$uploaded) {
+          try {
+            this.uploaded = new Date(Date.parse(media.yt$uploaded.$t));
+          }
+          catch (error) {
+            // ignore
+          }
+  
+        }
+  
         if (media.media$thumbnail && $.isArray(media.media$thumbnail)) {
           this.thumbnails = $.map(media.media$thumbnail, function (image) {
             return image; // width, height, url, time
           });
-        } 
+        }
       }
     }
     catch (error) {
       console.log(error);
     }
-    
+  
     return this;
   };
   
@@ -236,11 +258,9 @@
     if (!this.duration_in_seconds) {
       return '';
     }
-    
-    var h = this.hours(), m = this.minutes(), s = this.seconds(),
-      pad = function (num) { return ('0' + num).slice(-2); };
   
-    
+    var h = this.hours(), m = this.minutes(), s = this.seconds();
+  
     return (h ? [h, pad(m), pad(s)] : [m, pad(s)]).join(':');
   };
   
@@ -256,6 +276,7 @@
       author_url: this.author.url,
       views: this.statistics.views,
       favorites: this.statistics.favorites,
+      uploaded: format_date(this.uploaded),
       url: this.thumbnails[options.thumbnail].url
     };
   };
@@ -264,7 +285,7 @@
   Video.prototype.render = function (templates, options) {
     var properties = this.properties($.extend({}, Video.defaults, options));
     templates = templates || Video.templates;
-    
+  
     return templates.video.supplant({
       id: this.id,
       index: options.index,
@@ -275,8 +296,6 @@
       statistics: Video.templates.statistics.supplant(properties)
     });
   };
-  
-  
   
   
   /** Tube Constructor */
@@ -570,7 +589,7 @@
   
   var Player = function (options) {
     var self = this;
-    
+  
     this.options = $.extend({}, Player.defaults, options);
     this.p = null;
   
@@ -666,8 +685,8 @@
       return this.load(video);
     }
   
-    if (video) {    
-      this.p.loadVideoById(video.id || video, 0, this.options.quality);    
+    if (video) {
+      this.p.loadVideoById(video.id || video, 0, this.options.quality);
     }
     else {
       this.p.playVideo();
@@ -716,7 +735,7 @@
   
   // TODO change switch to improve testability
   
-  if ($.isFunction(window.postMessage) && !$.browser.msie) {
+  if ($.isFunction(window.postMessage) && false) {
   
     // Use the iFrame API
     // https://code.google.com/apis/youtube/iframe_api_reference.html
@@ -725,7 +744,7 @@
     Player.constants.api = '//www.youtube.com/player_api';
     
     Player.load = function (callback) {
-      if (typeof YT === 'undefined') {      
+      if (typeof YT === 'undefined') {
         var tag = document.createElement('script');
       
         if ($.isFunction(callback)) {
@@ -737,7 +756,7 @@
           Player.semaphore = 1;
           
           tag.src = Player.constants.api;
-          $('script:first').before(tag);        
+          $('script:first').before(tag);
         }
   
         return false;
@@ -818,20 +837,17 @@
   
     Player.load = function (callback) {
       if (typeof swfobject === 'undefined') {
-        var tag = document.createElement('script');
-  
-        $(tag).load(function () {
+          
+        $.getScript(Player.constants.swfobject, function () {
           if ($.isFunction(callback)) {
             callback.call();
-          }     
+          }
         });
-  
-        tag.src = Player.constants.swfobject;
-        $('script:first').before(tag);
-    
+      
         return false;
       }
-      
+    
+      // Execute the callback (non-blocking)
       if ($.isFunction(callback)) {
         setTimeout(callback, 0);
       }     
@@ -866,6 +882,7 @@
             }
           }
           else {
+  
             // Map YouTube native events to our own events
             $.each(Player.constants.events, function (key, value) {
               options.events[key] = self.event_proxy_for(value);
@@ -894,8 +911,8 @@
           
         }
         catch (error) {
-          // console.log('Failed to load YouTube player: ', error);
-          dom.append('Failed to load YouTube player: ' + error.toString());
+          console.log('Failed to load YouTube player: ', error);
+          // dom.append('Failed to load YouTube player: ' + error.toString());
         }
       });
   
