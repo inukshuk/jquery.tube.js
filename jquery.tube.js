@@ -729,7 +729,7 @@
   
   // TODO change switch to improve testability
   
-  if ($.isFunction(window.postMessage) && false) {
+  if ($.isFunction(window.postMessage)) {
   
     // Use the iFrame API
     // https://code.google.com/apis/youtube/iframe_api_reference.html
