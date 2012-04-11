@@ -20,7 +20,7 @@ Video.templates = {
 	title: '<h1>{title} ({duration})</h1>',
 	author: '<a href="{author_url}">{author}</a>',
 	description: '<p>{description}</p>',
-	statistics: '<span class="statistics">{views} / {favorites}</span>',
+	statistics: '<span class="statistics">{views} / {favorites} / {uploaded}</span>',
 	video: '<a href="#{id}" rel="{index}">{title}{thumbnail}{description}<p>{author} – {statistics}</p></a>'
 };
 
@@ -106,7 +106,9 @@ Video.prototype.parse = function (json) {
 
 			if (media.yt$uploaded) {
 			  try {
-				  this.uploaded = new Date(Date.parse(media.yt$uploaded.$t));
+				  this.uploaded = new Date(Date.parse(media.yt$uploaded.$t) ||
+						// IE workaround
+						Date.parse(media.yt$uploaded.$t.replace(/-/g, '/').replace(/T.*/, '')));
 			  }
 			  catch (error) {
 			    // ignore

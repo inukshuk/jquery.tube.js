@@ -145,7 +145,7 @@ Player.prototype.clear = function () {
 
 // TODO change switch to improve testability
 
-if ($.isFunction(window.postMessage)) {
+if ($.isFunction(window.postMessage) && !$.browser.msie) {
 
   // Use the iFrame API
   // https://code.google.com/apis/youtube/iframe_api_reference.html
