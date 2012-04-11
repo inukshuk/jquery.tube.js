@@ -1,0 +1,141 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>Jquery.tube.js by inukshuk</title>
+
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <script src="javascripts/scale.fix.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <h1>Jquery.tube.js</h1>
+<p>jQuery plugin for accessing YouTube's player and data APIs</p>
+        <p class="view"><a href="https://github.com/inukshuk/jquery.tube.js">View the Project on GitHub <small>inukshuk/jquery.tube.js</small></a></p>
+        <ul>
+          <li><a href="https://github.com/inukshuk/jquery.tube.js/zipball/master">Download <strong>ZIP File</strong></a></li>
+          <li><a href="https://github.com/inukshuk/jquery.tube.js/tarball/master">Download <strong>TAR Ball</strong></a></li>
+          <li><a href="https://github.com/inukshuk/jquery.tube.js">View On <strong>GitHub</strong></a></li>
+        </ul>
+      </header>
+      <section>
+        <h3>Play YouTube Videos with jQuery</h3>
+
+<p>jquery.tube.js is a jQuery plugin to access YouTube's <a href="https://developers.google.com/youtube/iframe_api_reference">player</a>
+and <a href="https://developers.google.com/youtube/2.0/reference">data</a> APIs
+transparently. The basic approach is centered around 'tube' objects: a
+tube is an abstract container filled with videos based on a YouTube
+playlist, user's feed or a search query; a tube offers the basic control and
+event handling interfaces you would expect from a playlist (play, pause, next,
+etc.) and is associated with a player instance. A player is a thin wrapper
+around YouTube's iFrame or (if window.pushMessage is unavailable) JavaScript
+player API; thus, the player is intended to work transparently on legacy
+browsers (IE7) and HTML5 capable devices without Flash support.</p>
+
+<p>This plugin contains no stylesheets; tube instances create simple HTML
+lists of their contents (the structure can be adjusted for each instance
+through a simple template system).</p>
+
+<h3>Documentation</h3>
+
+<p>If all you want to do is play a video, you can create a new player instance
+with a YouTube video ID:</p>
+
+<pre><code>$('#player-container').player({ video: 'ylLzyHk54Z0' });
+</code></pre>
+
+<p>You can pass more options to set up event handlers or specific YouTube configuration
+options; you can retrieve the player object using jQuery's data method, like this:</p>
+
+<pre><code>$('#player-container').data('player');
+</code></pre>
+
+<p>More interesting than the player object, however, are tube objects. A tube is
+basically a bunch of videos based on either a user's feed, a specific playlist,
+or a search query on YouTube. For example:</p>
+
+<pre><code>$('#playlist-container-1').tube({
+  player: 'player-container',
+  query: 'lolcats',
+  limit: 5
+});
+</code></pre>
+
+<p>This will display five cat videos (just what the world needs) in the
+'playlist-container-1'; if you click on any of the videos the video will
+start playing in a new player instance created in 'player-container'.</p>
+
+<p>Next, you could add a second playlist whose videos will play back in
+the same player instance:</p>
+
+<pre><code>$('#playlist-container-2').tube({
+  player: 'player-container',
+  user: 'GoogleDevelopers',
+  limit: 5
+});
+</code></pre>
+
+<p>This will add the latest five videos uploaded by the user GoogleDevelopers.</p>
+
+<p>For more examples, consult the examples in the <code>demo</code> and <code>test</code>
+directories.</p>
+
+<h3>Development</h3>
+
+<p>This plugin uses the awesome <a href="https://github.com/visionmedia/mocha">mocha</a>
+framework for testing; in order to run the tests you need to install a
+few libraries through npm:</p>
+
+<pre><code>$ npm install -g mocha
+$ npm install -g should
+$ npm install jsdom
+$ npm install jquery
+$ rake test
+</code></pre>
+
+<p>There is also a Rakefile that makes it easy to build and minify the plugin:</p>
+
+<pre><code>$ rake build minify
+</code></pre>
+
+<h3>License</h3>
+
+<p>(The MIT License)</p>
+
+<p>Copyright (c) 2012 Sylvester Keil, Thomas Egger.</p>
+
+<p>Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:</p>
+
+<p>The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.</p>
+
+<p>THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.</p>
+      </section>
+    </div>
+    <footer>
+      <p>Project maintained by <a href="https://github.com/inukshuk">inukshuk</a></p>
+      <p>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></p>
+    </footer>
+    <!--[if !IE]><script>fixScale(document);</script><!--<![endif]-->
+    
+  </body>
+</html>
