@@ -142,7 +142,7 @@
     at: '\n',
     max: 140,
     omission: '…',
-    thumbnail: 0,
+    thumbnail: 'mqdefault', // index or name
     index: 0
   };
   
@@ -183,6 +183,8 @@
   
   /** Parses a YouTube JSON element */
   Video.prototype.parse = function (json) {
+    var self = this;
+    
     try {
       if (json.author && $.isArray(json.author)) {
         this.author = {
@@ -231,7 +233,9 @@
   
         if (media.media$thumbnail && $.isArray(media.media$thumbnail)) {
           this.thumbnails = $.map(media.media$thumbnail, function (image) {
-            return image; // width, height, url, time
+            return {
+              width: image.width, height: image.height, url: image.url, name: image.yt$name
+            };
           });
         }
       }
@@ -268,6 +272,19 @@
   
   /** Returns the image as a property hash (used by the templates) */
   Video.prototype.properties = function (options) {
+    if (typeof options.thumbnail === 'string') {
+      var index = 0;
+      
+      $.each(this.thumbnails, function (i) {
+        if (this.name === options.thumbnail) {
+          index = i;
+          return false;
+        }
+      });
+      
+      options.thumbnail = index;
+    }
+    
     return {
       id: this.id,
       index: options.index,
@@ -595,6 +612,9 @@
     this.options = $.extend({}, Player.defaults, options);
     this.p = null;
   
+    // Resolve player's id
+    this.options.id = resolve_player_id(this.options.id);
+    
     // Mix-in observer pattern
     observable.apply(this);
   
@@ -674,6 +694,19 @@
   Player.semaphore = 0;
   
   Player.events = ['unstarted', 'end', 'play', 'cue', 'buffer', 'pause', 'error'];
+  
+  /** Private Methods */
+  
+  // Allow us to pass in CSS selectors and resolve the element's id
+  var resolve_player_id = function (id) {
+    if ((/^#|\./).test(id)) {
+      return $(id).attr('id') || id;
+    }
+    else {
+      return id;
+    }
+  };
+  
   
   /** Instance Methods */
   

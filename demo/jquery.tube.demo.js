@@ -8,7 +8,7 @@
 		
 		$('#player-1').player({ video: 'A6t9Vn7-9eU', events: { end: event_handler, play: event_handler, pause: event_handler } });
 		
-	  $('#tube-1').tube({ player: 'player-2', user: 'CTBTO', thumbnail: 0, autoplay: true, limit: 5, start: 3, controls: 1, hide: 1,
+	  $('#tube-1').tube({ player: 'player-2', user: 'CTBTO', thumbnail: 'hqdefault', autoplay: true, limit: 5, start: 3, controls: 1, hide: 1,
 	    events: { load: event_handler, play: event_handler, pause: event_handler,
 	    stop: event_handler, end: event_handler, ready: event_handler }, truncate: true,
 	    templates: { description: '<p>Description:</p><p>{description}</p>' }

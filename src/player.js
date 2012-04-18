@@ -9,6 +9,9 @@ var Player = function (options) {
   this.options = $.extend({}, Player.defaults, options);
   this.p = null;
 
+	// Resolve player's id
+	this.options.id = resolve_player_id(this.options.id);
+	
   // Mix-in observer pattern
   observable.apply(this);
 
@@ -88,6 +91,19 @@ Player.callbacks = [];
 Player.semaphore = 0;
 
 Player.events = ['unstarted', 'end', 'play', 'cue', 'buffer', 'pause', 'error'];
+
+/** Private Methods */
+
+// Allow us to pass in CSS selectors and resolve the element's id
+var resolve_player_id = function (id) {
+	if ((/^#|\./).test(id)) {
+		return $(id).attr('id') || id;
+	}
+	else {
+		return id;
+	}
+};
+
 
 /** Instance Methods */
 

@@ -29,7 +29,7 @@ Video.defaults = {
 	at: '\n',
 	max: 140,
 	omission: '…',
-	thumbnail: 0,
+	thumbnail: 'mqdefault', // index or name
 	index: 0
 };
 
@@ -70,6 +70,8 @@ var format_date = function (date) {
 
 /** Parses a YouTube JSON element */
 Video.prototype.parse = function (json) {
+	var self = this;
+	
 	try {
 		if (json.author && $.isArray(json.author)) {
 			this.author = {
@@ -118,7 +120,9 @@ Video.prototype.parse = function (json) {
 
 			if (media.media$thumbnail && $.isArray(media.media$thumbnail)) {
 				this.thumbnails = $.map(media.media$thumbnail, function (image) {
-					return image; // width, height, url, time
+					return {
+						width: image.width, height: image.height, url: image.url, name: image.yt$name
+					};
 				});
 			}
 		}
@@ -155,6 +159,19 @@ Video.prototype.duration = function () {
 
 /** Returns the image as a property hash (used by the templates) */
 Video.prototype.properties = function (options) {
+	if (typeof options.thumbnail === 'string') {
+		var index = 0;
+		
+		$.each(this.thumbnails, function (i) {
+			if (this.name === options.thumbnail) {
+				index = i;
+				return false;
+			}
+		});
+		
+		options.thumbnail = index;
+	}
+	
   return {
     id: this.id,
     index: options.index,
