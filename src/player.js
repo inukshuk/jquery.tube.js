@@ -167,7 +167,7 @@ if ($.isFunction(window.postMessage) && !$.browser.msie) {
   // https://code.google.com/apis/youtube/iframe_api_reference.html
   
   Player.api = 'iframe';
-  Player.constants.api = '//www.youtube.com/player_api';
+  Player.constants.api = 'https://www.youtube.com/player_api';
 
 
 	Player.prototype.event_proxy_for = function (event) {
