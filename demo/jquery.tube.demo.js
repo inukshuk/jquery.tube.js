@@ -19,7 +19,7 @@
       stop: event_handler, end: event_handler, ready: event_handler }
     });
 
-    $('#tube-3').tube({ player: 'player-1', query: 'nuclear testing', autoplay: true, limit: 3,
+    $('#tube-3').tube({ player: 'player-1', query: 'nuclear testing', limit: 3,
       events: { load: event_handler, play: event_handler, pause: event_handler,
       stop: event_handler, end: event_handler, ready: event_handler }
     });

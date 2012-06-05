@@ -751,6 +751,17 @@
     return this;
   };
   
+  Player.prototype.seek = function (to, seek_ahead) {
+    if (this.p) {
+      if (undefined === seek_ahead) {
+        seek_ahead = true;
+      }
+      
+      this.p.seekTo(to, seek_ahead);
+    }
+    return this;
+  };
+  
   Player.prototype.clear = function () {
     if (this.p) {
       this.p.stopVideo();
@@ -1053,7 +1064,7 @@
       element = this.first();
       
       if (element.data('player')) {
-        element.data('player').play(options.video);
+        element.data.player.play(options.video);
       }
       else {
         
