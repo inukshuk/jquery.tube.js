@@ -1,7 +1,7 @@
 require 'json'
 require 'uglifier'
 
-VERSION = '0.0.1'
+VERSION = '0.0.2'
 
 LICENSE = <<-END
 /*! jquery.tube.js #{VERSION} | https://github.com/inukshuk/jquery.tube.js/blob/master/LICENSE */
