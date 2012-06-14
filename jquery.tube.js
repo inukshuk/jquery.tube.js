@@ -111,7 +111,7 @@
     return this;
   };
   
-  /*global $: true, exports: true, console: true */
+  /*global $: true, Tube: true, exports: true, console: true */
   
   /** Video Constructor */
   
@@ -135,6 +135,12 @@
     description: '<p>{description}</p>',
     statistics: '<span class="statistics">{views} / {favorites} / {uploaded}</span>',
     video: '<a href="#{id}" rel="{index}">{title}{thumbnail}{description}<p>{author} – {statistics}</p></a>'
+  };
+  
+  Video.parameters = {
+    v: 2,
+    alt: 'json-in-script',
+    callback: '?'
   };
   
   Video.defaults = {
@@ -245,6 +251,39 @@
     }
   
     return this;
+  };
+  
+  /** Loads and parses the video with the given YouTube ID and executes the callback */
+  Video.prototype.load = function (id, callback) {
+    var self = this;
+    
+    self.id = id;
+    
+    $.getJSON(self.request(), function (data) {
+      try {
+        if (data.entry) {
+          self.parse(data.entry);
+        } 
+  
+        if (callback && $.isFunction(callback)) {  
+          callback.apply(self, [1, data]);
+        }
+      }
+      catch (error) {
+        if (callback && $.isFunction(callback)) {  
+          callback.apply(self, [0, error]);
+        }
+      }
+    });
+    
+    
+    return this;
+  };
+  
+  
+  Video.prototype.request = function () {
+    return [Tube.constants.api, 'videos', '/', this.id, '?',
+      Tube.serialize(Video.parameters)].join('');
   };
   
   Video.prototype.seconds = function () {
@@ -614,7 +653,7 @@
   
     // Resolve player's id
     this.options.id = resolve_player_id(this.options.id);
-    
+  
     // Mix-in observer pattern
     observable.apply(this);
   
@@ -721,6 +760,7 @@
     }
   
     if (video) {
+      this.video = video;
       this.p.loadVideoById(video.id || video, 0, this.options.quality);
     }
     else {
@@ -770,6 +810,21 @@
     return this;
   };
   
+  /* Returns the current video or null */
+  Player.prototype.current_video = function (callback) {
+    var video = this.video || this.options.video;
+    
+    if (video && !video.id) {
+      // this.video is not a video object, so we assume it is a YouTube ID
+      this.video = (new Video()).load(video, callback);
+      return this.video;
+    }
+  
+    if ($.isFunction(callback)) {
+      window.setTimeout(function () { callback.apply(video); }, 0);
+    }
+    return video;
+  };
   
   /** API Dependent Methods */
   
@@ -821,23 +876,26 @@
   
       Player.load(function () {
         try {
-          
+  
           // Check whether or not a Player instance already exists
           if (dom.data('player')) {
-            
+  
             // Extract the player reference
             self.p = dom.data('player').p;
-          
+  
             // Register event proxies
             $.each(Player.constants.events, function (key, value) {
               self.p.addEventListener(key, self.event_proxy_for(value));
             });
-            
+  
             // If load was called with a video, play the video right away.
             // Make sure we actually have both video and p to prohibit cricular
             // call.
             if (video && self.p) {
               self.play(video);
+            }
+            else {
+              self.video = video;
             }
           }
           else {
@@ -850,6 +908,11 @@
   
             // Store a player reference
             dom.data('player', self);
+            
+            // Save the current video
+            if (video) {
+              self.video = video;
+            }
           }
           
         }

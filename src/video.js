@@ -1,4 +1,4 @@
-/*global $: true, exports: true, console: true */
+/*global $: true, Tube: true, exports: true, console: true */
 
 /** Video Constructor */
 
@@ -22,6 +22,12 @@ Video.templates = {
 	description: '<p>{description}</p>',
 	statistics: '<span class="statistics">{views} / {favorites} / {uploaded}</span>',
 	video: '<a href="#{id}" rel="{index}">{title}{thumbnail}{description}<p>{author} – {statistics}</p></a>'
+};
+
+Video.parameters = {
+  v: 2,
+  alt: 'json-in-script',
+  callback: '?'
 };
 
 Video.defaults = {
@@ -132,6 +138,39 @@ Video.prototype.parse = function (json) {
 	}
 
 	return this;
+};
+
+/** Loads and parses the video with the given YouTube ID and executes the callback */
+Video.prototype.load = function (id, callback) {
+  var self = this;
+  
+  self.id = id;
+  
+  $.getJSON(self.request(), function (data) {
+		try {
+      if (data.entry) {
+        self.parse(data.entry);
+      } 
+
+      if (callback && $.isFunction(callback)) {  
+        callback.apply(self, [1, data]);
+      }
+		}
+		catch (error) {
+			if (callback && $.isFunction(callback)) {  
+        callback.apply(self, [0, error]);
+      }
+		}
+  });
+  
+  
+  return this;
+};
+
+
+Video.prototype.request = function () {
+  return [Tube.constants.api, 'videos', '/', this.id, '?',
+    Tube.serialize(Video.parameters)].join('');
 };
 
 Video.prototype.seconds = function () {
