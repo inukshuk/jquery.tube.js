@@ -234,8 +234,19 @@
           catch (error) {
             // ignore
           }
-  
         }
+  
+        if (media.yt$updated) {
+          try {
+            this.updated = new Date(Date.parse(media.yt$updated.$t) ||
+              // IE workaround
+              Date.parse(media.yt$updated.$t.replace(/-/g, '/').replace(/T.*/, '')));
+          }
+          catch (error) {
+            // ignore
+          }
+        }
+  
   
         if (media.media$thumbnail && $.isArray(media.media$thumbnail)) {
           this.thumbnails = $.map(media.media$thumbnail, function (image) {
@@ -335,6 +346,7 @@
       views: this.statistics.views,
       favorites: this.statistics.favorites,
       uploaded: format_date(this.uploaded),
+      updated: format_date(this.updated),
       url: this.thumbnails[options.thumbnail].url
     };
   };
@@ -342,16 +354,16 @@
   /** Returns the video as an HTML string */
   Video.prototype.render = function (templates, options) {
     var properties = this.properties($.extend({}, Video.defaults, options));
-    templates = templates || Video.templates;
+    templates = $.extend({}, Video.templates, templates);
   
     return templates.video.supplant({
-      id: this.id,
-      index: options.index,
-      title: Video.templates.title.supplant(properties),
-      thumbnail: Video.templates.thumbnail.supplant(properties),
-      description: Video.templates.description.supplant(properties),
-      author: Video.templates.author.supplant(properties),
-      statistics: Video.templates.statistics.supplant(properties)
+      id: properties.id,
+      index: properties.index,
+      title: templates.title.supplant(properties),
+      thumbnail: templates.thumbnail.supplant(properties),
+      description: templates.description.supplant(properties),
+      author: templates.author.supplant(properties),
+      statistics: templates.statistics.supplant(properties)
     });
   };
   
@@ -760,7 +772,7 @@
     }
   
     if (video) {
-      this.video = video;
+      this.p.current_video = video;
       this.p.loadVideoById(video.id || video, 0, this.options.quality);
     }
     else {
@@ -812,7 +824,7 @@
   
   /* Returns the current video or null */
   Player.prototype.current_video = function (callback) {
-    var video = this.video || this.options.video;
+    var video = this.p && this.p.current_video;
     
     if (video && !video.id) {
       // this.video is not a video object, so we assume it is a YouTube ID
@@ -894,9 +906,6 @@
             if (video && self.p) {
               self.play(video);
             }
-            else {
-              self.video = video;
-            }
           }
           else {
             // Map YouTube native events to our own events
@@ -911,7 +920,7 @@
             
             // Save the current video
             if (video) {
-              self.video = video;
+              self.p.current_video = video;
             }
           }
           

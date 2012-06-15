@@ -118,7 +118,7 @@ Player.prototype.play = function (video) {
   }
 
   if (video) {
-    this.video = video;
+    this.p.current_video = video;
     this.p.loadVideoById(video.id || video, 0, this.options.quality);
   }
   else {
@@ -170,7 +170,7 @@ Player.prototype.clear = function () {
 
 /* Returns the current video or null */
 Player.prototype.current_video = function (callback) {
-  var video = this.video || this.options.video;
+  var video = this.p && this.p.current_video;
   
   if (video && !video.id) {
     // this.video is not a video object, so we assume it is a YouTube ID
@@ -252,9 +252,6 @@ if ($.isFunction(window.postMessage) && !$.browser.msie) {
           if (video && self.p) {
             self.play(video);
           }
-          else {
-            self.video = video;
-          }
         }
         else {
           // Map YouTube native events to our own events
@@ -269,7 +266,7 @@ if ($.isFunction(window.postMessage) && !$.browser.msie) {
           
           // Save the current video
           if (video) {
-            self.video = video;
+            self.p.current_video = video;
           }
         }
         

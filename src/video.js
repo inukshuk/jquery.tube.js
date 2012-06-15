@@ -121,8 +121,19 @@ Video.prototype.parse = function (json) {
 			  catch (error) {
 			    // ignore
 			  }
-
 			}
+
+			if (media.yt$updated) {
+			  try {
+				  this.updated = new Date(Date.parse(media.yt$updated.$t) ||
+						// IE workaround
+						Date.parse(media.yt$updated.$t.replace(/-/g, '/').replace(/T.*/, '')));
+			  }
+			  catch (error) {
+			    // ignore
+			  }
+			}
+
 
 			if (media.media$thumbnail && $.isArray(media.media$thumbnail)) {
 				this.thumbnails = $.map(media.media$thumbnail, function (image) {
@@ -222,6 +233,7 @@ Video.prototype.properties = function (options) {
     views: this.statistics.views,
     favorites: this.statistics.favorites,
     uploaded: format_date(this.uploaded),
+    updated: format_date(this.updated),
     url: this.thumbnails[options.thumbnail].url
   };
 };
@@ -229,16 +241,16 @@ Video.prototype.properties = function (options) {
 /** Returns the video as an HTML string */
 Video.prototype.render = function (templates, options) {
   var properties = this.properties($.extend({}, Video.defaults, options));
-  templates = templates || Video.templates;
+  templates = $.extend({}, Video.templates, templates);
 
 	return templates.video.supplant({
-	  id: this.id,
-	  index: options.index,
-		title: Video.templates.title.supplant(properties),
-		thumbnail: Video.templates.thumbnail.supplant(properties),
-		description: Video.templates.description.supplant(properties),
-		author: Video.templates.author.supplant(properties),
-		statistics: Video.templates.statistics.supplant(properties)
+	  id: properties.id,
+	  index: properties.index,
+		title: templates.title.supplant(properties),
+		thumbnail: templates.thumbnail.supplant(properties),
+		description: templates.description.supplant(properties),
+		author: templates.author.supplant(properties),
+		statistics: templates.statistics.supplant(properties)
 	});
 };
 
