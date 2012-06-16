@@ -2,3 +2,4 @@
 --require jsdom
 --require jquery
 --reporter dot
+--timeout 5000

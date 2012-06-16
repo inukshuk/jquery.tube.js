@@ -3,8 +3,7 @@
 /** Video Constructor */
 
 var Video = function (properties) {
-	this.statistics = {};
-	this.thumbnails = [];
+	this.statistics = {}, this.thumbnails = [], this.acl = {};
 
 	if (properties) {
 		$.extend(this, properties);
@@ -92,8 +91,25 @@ Video.prototype.parse = function (json) {
 			this.statistics.views = json.yt$statistics.viewCount;
 		}
 
+		if (json.yt$accessControl && json.yt$accessControl.length) {
+		  $.each(json.yt$accessControl, function () {
+		    self.acl[this.action] = this.permission;
+		  });
+    }
+    
 		if (json.title) {
 			this.title = json.title.$t;
+		}
+
+		if (json.updated) {
+		  try {
+			  this.updated = new Date(Date.parse(json.updated.$t) ||
+					// IE workaround
+					Date.parse(json.updated.$t.replace(/-/g, '/').replace(/T.*/, '')));
+		  }
+		  catch (error) {
+		    // ignore
+		  }
 		}
 
 		if (json.media$group) {
@@ -122,18 +138,6 @@ Video.prototype.parse = function (json) {
 			    // ignore
 			  }
 			}
-
-			if (media.yt$updated) {
-			  try {
-				  this.updated = new Date(Date.parse(media.yt$updated.$t) ||
-						// IE workaround
-						Date.parse(media.yt$updated.$t.replace(/-/g, '/').replace(/T.*/, '')));
-			  }
-			  catch (error) {
-			    // ignore
-			  }
-			}
-
 
 			if (media.media$thumbnail && $.isArray(media.media$thumbnail)) {
 				this.thumbnails = $.map(media.media$thumbnail, function (image) {
@@ -179,9 +183,10 @@ Video.prototype.load = function (id, callback) {
 };
 
 
-Video.prototype.request = function () {
+Video.prototype.request = function (parameters) {
+  parameters = parameters || Video.parameters;
   return [Tube.constants.api, 'videos', '/', this.id, '?',
-    Tube.serialize(Video.parameters)].join('');
+    Tube.serialize(parameters)].join('');
 };
 
 Video.prototype.seconds = function () {
@@ -205,6 +210,10 @@ Video.prototype.duration = function () {
 	var h = this.hours(), m = this.minutes(), s = this.seconds();
 
 	return (h ? [h, pad(m), pad(s)] : [m, pad(s)]).join(':');
+};
+
+Video.prototype.is_listed = function () {
+  return this.acl['list'] !== 'denied';
 };
 
 /** Returns the image as a property hash (used by the templates) */
