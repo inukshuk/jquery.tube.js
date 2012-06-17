@@ -113,7 +113,7 @@ Tube.serialize = function (parameters) {
 
 /*
  * Populates the tube object with data from YouTube. If function is passed
- * as an argument to this method, it will be called when the AJAX request
+ * as an argument to this method, it will be called when the AJAX request(s)
  * returns. The callback will be applied to the tube object and passed the
  * number of videos that were fetched (i.e., a zero value indicates failure
  * or no results).

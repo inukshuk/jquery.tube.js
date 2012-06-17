@@ -1,6 +1,5 @@
 jquery.tube.js
 ==============
-
 Tube is a jQuery plugin to access YouTube's player and data APIs
 transparently. The basic approach is centered around 'tube' objects: a
 tube is an abstract container filled with videos based on a YouTube
@@ -17,14 +16,12 @@ through a simple template system).
 
 Documentation
 -------------
-
 For the time being, consult the examples in the `demo` and `test`
 directories.
 
 
 Development
 -----------
-
 This plugin uses the awesome [mocha](https://github.com/visionmedia/mocha)
 framework for testing; in order to run the tests you need to install a
 few libraries through npm:
@@ -34,11 +31,10 @@ few libraries through npm:
     $ npm install jsdom
     $ npm install jquery
     $ rake test
-    
+
 
 License
 -------
-
 (The MIT License)
 
 Copyright (c) 2012 Sylvester Keil, Thomas Egger.

@@ -212,6 +212,11 @@ Video.prototype.duration = function () {
 	return (h ? [h, pad(m), pad(s)] : [m, pad(s)]).join(':');
 };
 
+/** Returns the video's visibility as a string ['listed', 'unlisted'] */
+Video.prototype.visibility = function () {
+  return this.is_listed() ? 'listed' : 'unlisted';
+};
+
 Video.prototype.is_listed = function () {
   return this.acl['list'] !== 'denied';
 };
@@ -240,6 +245,7 @@ Video.prototype.properties = function (options) {
     author: this.author.name,
     author_url: this.author.url,
     views: this.statistics.views,
+    visibility: this.visibility(),
     favorites: this.statistics.favorites,
     uploaded: format_date(this.uploaded),
     updated: format_date(this.updated),
@@ -255,6 +261,7 @@ Video.prototype.render = function (templates, options) {
 	return templates.video.supplant({
 	  id: properties.id,
 	  index: properties.index,
+    visibility: properties.visibility,
 		title: templates.title.supplant(properties),
 		thumbnail: templates.thumbnail.supplant(properties),
 		description: templates.description.supplant(properties),
