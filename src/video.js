@@ -168,12 +168,12 @@ Video.prototype.load = function (id, callback) {
       } 
 
       if (callback && $.isFunction(callback)) {  
-        callback.apply(self, [1, data]);
+        callback.apply(self, [1, data, self]);
       }
 		}
 		catch (error) {
 			if (callback && $.isFunction(callback)) {  
-        callback.apply(self, [0, error]);
+        callback.apply(self, [0, error, self]);
       }
 		}
   });

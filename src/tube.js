@@ -7,7 +7,7 @@ var Tube = function (options) {
   this.videos = [];
   this.options = $.extend({}, Tube.defaults, options);
 	this.current = 0;
-	this.player = new Player(this.player_options());
+	this.player = Player.create(this.player_options());
 
 	this.options.templates = $.extend(Video.templates, this.options.templates || {});
 
@@ -164,7 +164,6 @@ Tube.prototype.load = function (callback) {
   	      self.videos = $.map(data.feed.entry, function(item) {
   	        return new Video().parse(item);
   	      });
-
 
   				if (success && (self.options.autoload || self.options.start)) {
   					self.current = Math.min(self.videos.length - 1, Math.max(0, self.options.start - 1));

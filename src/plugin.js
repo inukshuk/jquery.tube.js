@@ -79,7 +79,7 @@ $.fn.player = function (args) {
       options.id = element.attr('id');
             
       if (options.video) {
-        new Player(options).load(options.video);
+        Player.create(options).load(options.video);
       }      
     }
   }
