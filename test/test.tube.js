@@ -164,14 +164,14 @@ describe('Tube', function () {
           delete tube.options.list;
         });
 
-        it('the tube contains all requested videos', function (data) {
-          tube.load(function () {
-            this.videos.length.should.equal(3);
-            this.videos[2].should.have.property('author');
-            this.videso[2].author.name.should.match(/google/i);
-            done();
-          });
-        });
+        // it('the tube contains all requested videos', function (data) {
+        //   tube.load(function () {
+        //     this.videos.length.should.equal(3);
+        //     this.videos[2].should.have.property('author');
+        //     this.videso[2].author.name.should.match(/google/i);
+        //     done();
+        //   });
+        // });
 
       });
     });
