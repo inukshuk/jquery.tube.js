@@ -1155,9 +1155,15 @@
       }
       else {
         
-        // TODO generate id in case this element does not have one
         options.id = element.attr('id');
-              
+        
+        // If the element does not have an id, generate one.
+        // NB: we use a simple counter here and no collision detection!
+        if (!options.id) {
+          element.attr('id', 'jquery-tube-player-' + ($.player.counter++));
+          options.id = element.attr('id');
+        }
+                    
         if (options.video) {
           Player.create(options).load(options.video);
         }      
@@ -1175,4 +1181,5 @@
   
   $.player = {};
   $.player.defaults = Player.defaults;
+  $.player.counter = 0;
 }(jQuery, window, window.document, '0.1.0'));

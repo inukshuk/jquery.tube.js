@@ -17,36 +17,36 @@ $.fn.tube = function (args) {
     element.data('tube', new Tube(options).load(function (success) {
       var tube = this, playlist;
 
-			if (success) {
-	      if (tube.options.render) {
-	        playlist = $(tube.render());
+      if (success) {
+        if (tube.options.render) {
+          playlist = $(tube.render());
 
-	        // setup on-click handlers to play video
-	        $('a[rel]', playlist).click(function (event) {
-						if ($.isFunction(tube.options.click)) {
-							tube.options.click.apply(tube, ['click', this, event]);
-						}
-	          tube.play($(this).attr('rel'));
-	        });
+          // setup on-click handlers to play video
+          $('a[rel]', playlist).click(function (event) {
+            if ($.isFunction(tube.options.click)) {
+              tube.options.click.apply(tube, ['click', this, event]);
+            }
+            tube.play($(this).attr('rel'));
+          });
 
-					if ($.isFunction(tube.options.load)) {
-						tube.options.load.apply(tube, ['load', playlist, element]);
-					}
-				
-	        element.append(playlist); 
-	
-	      }
-	
-				if ($.isFunction(tube.options.complete)) {
-					tube.options.complete.apply(tube, ['complete', playlist, element]);
-				}
-	
-			}
-			else {
-				if ($.isFunction(tube.options.complete)) {
-					tube.options.complete.apply(tube, ['error', playlist, element]);
-				}
-			}
+          if ($.isFunction(tube.options.load)) {
+            tube.options.load.apply(tube, ['load', playlist, element]);
+          }
+        
+          element.append(playlist); 
+  
+        }
+  
+        if ($.isFunction(tube.options.complete)) {
+          tube.options.complete.apply(tube, ['complete', playlist, element]);
+        }
+  
+      }
+      else {
+        if ($.isFunction(tube.options.complete)) {
+          tube.options.complete.apply(tube, ['error', playlist, element]);
+        }
+      }
       
     }));
     
@@ -75,9 +75,15 @@ $.fn.player = function (args) {
     }
     else {
       
-      // TODO generate id in case this element does not have one
       options.id = element.attr('id');
-            
+      
+      // If the element does not have an id, generate one.
+      // NB: we use a simple counter here and no collision detection!
+      if (!options.id) {
+        element.attr('id', 'jquery-tube-player-' + ($.player.counter++));
+        options.id = element.attr('id');
+      }
+                  
       if (options.video) {
         Player.create(options).load(options.video);
       }      
@@ -95,3 +101,4 @@ $.tube.defaults = Tube.defaults;
 
 $.player = {};
 $.player.defaults = Player.defaults;
+$.player.counter = 0;
