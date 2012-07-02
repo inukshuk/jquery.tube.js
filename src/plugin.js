@@ -71,7 +71,7 @@ $.fn.player = function (args) {
     element = this.first();
     
     if (element.data('player')) {
-      element.data.player.play(options.video);
+      element.data('player').play(options.video);
     }
     else {
       
