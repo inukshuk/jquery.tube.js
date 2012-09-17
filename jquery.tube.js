@@ -45,58 +45,58 @@
   /** A Simple Observer Pattern Implementation */
   
   var observable = function (observers) {
-    
+  
     // private observer list
     observers = observers || {};
-    
+  
     this.on = function (event, callback) {
       observers[event] = observers[event] || [];
-    
+  
       if ($.isFunction(callback)) {
-        observers[event].push(callback);      
+        observers[event].push(callback);
       }
-    
+  
       return this;
     };
-    
+  
     // registers a one-time event handler
     this.once = function (event, callback) {
       var self = this;
-      
+  
       return this.on(event, function () {
         self.off(event, callback);
         callback.apply(self, arguments);
       });
     };
-    
+  
     this.off = function (event, callback) {
       if (observers[event]) {
         var i, os = observers[event], matches = [];
-      
+  
         if (callback) {
           for (i = 0; i < os.length; ++i) {
             if (os[i] === callback) {
               matches.push(i);
             }
           }
-        
+  
           for (i = 0; i < matches; ++i) {
             os.remove(i);
           }
-        
+  
         }
         else {
           // remove all observers for the event
           observers[event] = [];
-        }      
+        }
       }
-    
+  
       return this;
     };
-    
+  
     this.notify = function () {
       var self = this, args = Array.prototype.slice.apply(arguments), event = arguments[0];
-      
+  
       if (observers[event]) {
         $.each(observers[event], function () {
           if ($.isFunction(this)) {
@@ -104,10 +104,10 @@
           }
         });
       }
-    
+  
       return this;
     };
-    
+  
     return this;
   };
   
@@ -176,11 +176,11 @@
   
   var format_date = function (date) {
     if (date === null) { return ''; }
-    
+  
     if (typeof date !== 'object') {
       return date;
     }
-    
+  
     return [date.getDate(), date.getMonth(), date.getFullYear()].join('.');
   };
   
@@ -189,7 +189,7 @@
   /** Parses a YouTube JSON element */
   Video.prototype.parse = function (json) {
     var self = this;
-    
+  
     try {
       if (json.author && $.isArray(json.author)) {
         this.author = {
@@ -209,7 +209,7 @@
           self.acl[this.action] = this.permission;
         });
       }
-      
+  
       if (json.title) {
         this.title = json.title.$t;
       }
@@ -271,27 +271,27 @@
   /** Loads and parses the video with the given YouTube ID and executes the callback */
   Video.prototype.load = function (id, callback) {
     var self = this;
-    
+  
     self.id = id;
-    
+  
     $.getJSON(self.request(), function (data) {
       try {
         if (data.entry) {
           self.parse(data.entry);
-        } 
+        }
   
-        if (callback && $.isFunction(callback)) {  
+        if (callback && $.isFunction(callback)) {
           callback.apply(self, [1, data, self]);
         }
       }
       catch (error) {
-        if (callback && $.isFunction(callback)) {  
+        if (callback && $.isFunction(callback)) {
           callback.apply(self, [0, error, self]);
         }
       }
     });
-    
-    
+  
+  
     return this;
   };
   
@@ -338,17 +338,17 @@
   Video.prototype.properties = function (options) {
     if (typeof options.thumbnail === 'string') {
       var index = 0;
-      
+  
       $.each(this.thumbnails, function (i) {
         if (this.name === options.thumbnail) {
           index = i;
           return false;
         }
       });
-      
+  
       options.thumbnail = index;
     }
-    
+  
     return {
       id: this.id,
       index: options.index,
@@ -719,7 +719,7 @@
     // Handle YouTube's state change events and dispatch using our taxonomy
     this.on('state', function (name, event) {
       var state = $.isNumeric(event) ? event : (event && event.data);
-      
+  
        switch (state) {
          case -1:
            this.notify('unstarted');
@@ -744,7 +744,7 @@
          // ignore
        }
     });
-    
+  
     // Register event handlers set in options
     $.each(Player.events, function (idx, event) {
       if (self.options.events[event]) {
@@ -755,15 +755,15 @@
   
   Player.create = function (options) {
     var dom, player;
-    
+  
     options = $.extend({}, Player.defaults, options);
   
     // Resolve player's id
     options.id = resolve_player_id(options.id);
-    
+  
     dom = $('#' + options.id);
     player = dom.data('player');
-    
+  
     if (!player) {
       player = new Player(options);
       dom.data('player', player);
@@ -838,7 +838,7 @@
     else {
       this.p.playVideo();
     }
-    
+  
     return this;
   };
   
@@ -868,7 +868,7 @@
       if (undefined === seek_ahead) {
         seek_ahead = true;
       }
-      
+  
       this.p.seekTo(to, seek_ahead);
     }
     return this;
@@ -885,7 +885,7 @@
   /* Returns the current video or null */
   Player.prototype.current_video = function (callback) {
     var video = this.p && this.p.current_video;
-    
+  
     if (video && !video.id) {
       // this.video is not a video object, so we assume it is a YouTube ID
       this.video = (new Video()).load(video, callback);
@@ -906,7 +906,7 @@
   
     // Use the iFrame API
     // https://code.google.com/apis/youtube/iframe_api_reference.html
-    
+  
     Player.api = 'iframe';
     Player.constants.api = 'https://www.youtube.com/player_api';
   
@@ -915,11 +915,11 @@
       return $.proxy(this.notify, this, event);
     };
   
-    
+  
     Player.load = function (callback) {
       if (typeof YT === 'undefined') {
         var tag = document.createElement('script');
-      
+  
         if ($.isFunction(callback)) {
           Player.callbacks.push(callback);
         }
@@ -927,27 +927,27 @@
         // Use semaphore to make sure we load the API just once
         if (Player.semaphore === 0) {
           Player.semaphore = 1;
-          
+  
           tag.src = Player.constants.api;
           $('script:first').before(tag);
         }
   
         return false;
       }
-      
+  
       if ($.isFunction(callback)) {
         setTimeout(callback, 0);
       }
   
       return true;
     };
-    
+  
     Player.prototype.load = function (video) {
       var self = this, options = $.extend({}, this.options, { videoId: video.id || video, events: {} }),
         dom = $('#' + options.id);
   
       Player.load(function () {
-        try {          
+        try {
           // Map YouTube native events to our own events
           $.each(Player.constants.events, function (key, value) {
             options.events[key] = self.event_proxy_for(value);
@@ -978,17 +978,17 @@
   
   }
   else {
-    
+  
     // Use the JavaScript API
     // https://code.google.com/apis/youtube/js_api_reference.html
     // https://code.google.com/p/swfobject/
-    
+  
     Player.api = 'js';
     Player.constants.api = '//www.youtube.com/v/{video}?enablejsapi=1&playerapiid={id}&version=3';
     Player.constants.swf_version = '8';
   
     Player.defaults.playerVars.autoplay = 1;
-    
+  
     // Workaround:
     // The JavaScript API can register event handlers only as strings. Therefore,
     // we need to set up a global proxy for each player instance.
@@ -998,34 +998,34 @@
   
       window[proxy] = function () {
         var args = Array.prototype.slice.apply(arguments);
-        
+  
         args.unshift(event);
         self.notify.apply(self, args);
-      };      
-      
+      };
+  
       return proxy;
     };
   
     Player.load = function (callback) {
       if (typeof swfobject === 'undefined') {
-          
+  
         $.getScript(Player.constants.swfobject, function () {
           if ($.isFunction(callback)) {
             callback.call();
           }
         });
-      
+  
         return false;
       }
-    
+  
       // Execute the callback (non-blocking)
       if ($.isFunction(callback)) {
         setTimeout(callback, 0);
-      }     
+      }
   
       return true;
     };
-    
+  
     Player.prototype.load = function (video) {
       var self = this, options = $.extend({}, this.options, { videoId: video.id || video, events: {} }),
         dom = $('#' + options.id);
@@ -1037,7 +1037,7 @@
   
             // Register event proxies
             $.each(Player.constants.events, function (key, value) {
-              self.p.addEventListener(key, self.event_proxy_for(value));  
+              self.p.addEventListener(key, self.event_proxy_for(value));
             });
   
             // Save the current video
@@ -1056,7 +1056,7 @@
             options.playerVars,
             { allowScriptAccess: 'always', wmode: 'opaque' },
             { id: options.id }
-          );        
+          );
         }
         catch (error) {
           console.log('Failed to load YouTube player: ', error);
@@ -1069,7 +1069,7 @@
   
     window.onYouTubePlayerReady = function () {
       var args = arguments;
-      
+  
       $.each(Player.callbacks, function () {
         this.apply(window, args);
       });
