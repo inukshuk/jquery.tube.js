@@ -6,29 +6,29 @@ var Tube = function (options) {
 
   this.videos = [];
   this.options = $.extend({}, Tube.defaults, options);
-	this.current = 0;
-	this.player = Player.create(this.player_options());
+  this.current = 0;
+  this.player = Player.create(this.player_options());
 
-	this.options.templates = $.extend(Video.templates, this.options.templates || {});
+  this.options.templates = $.extend(Video.templates, this.options.templates || {});
 
   observable.apply(this);
 
-	// Register Tube event handlers
-	$.each(Tube.events, function (idx, event) {
-	  if (self.options.events[event]) {
+  // Register Tube event handlers
+  $.each(Tube.events, function (idx, event) {
+    if (self.options.events[event]) {
       self.on(event, self.options.events[event]);
     }
-	});
+  });
 
-	// Register Player event proxies and handlers
-	$.each(Player.events, function (idx, event) {
+  // Register Player event proxies and handlers
+  $.each(Player.events, function (idx, event) {
 
-	  self.player.on(event, $.proxy(self.notify, self, event));
+    self.player.on(event, $.proxy(self.notify, self, event));
 
-	  if (self.options.events[event]) {
+    if (self.options.events[event]) {
       self.on(event, self.options.events[event]);
     }
-	});
+  });
 
 };
 
@@ -37,10 +37,10 @@ Tube.constants = {
 };
 
 Tube.defaults = {
-	player: 'player',
-	autoload: false, // load the player automatically?
-	autoplay: false,
-	start: 0,
+  player: 'player',
+  autoload: false, // load the player automatically?
+  autoplay: false,
+  start: 0,
   order: 'relevance', // 'published', 'rating', 'viewCount'
   author: false,
   hide: 2, // 0 = always visible, 1 = hide progress bar and controls, 2 = hide progress bar
@@ -50,14 +50,14 @@ Tube.defaults = {
   limit: 10,
   key: false,
   render: true,
-	truncate: false,
-	at: '\n', // pattern (truncate)
-	max: 140, // max length (truncate)
-	omission: '…', // omission string (truncate)
-	events: [],
-	load: false, // plugin callback when the playlist data has been loaded
-	complete: false, // plugin callback when the playlist html has been rendered
-	click: false // plugin callback
+  truncate: false,
+  at: '\n', // pattern (truncate)
+  max: 140, // max length (truncate)
+  omission: '…', // omission string (truncate)
+  events: [],
+  load: false, // plugin callback when the playlist data has been loaded
+  complete: false, // plugin callback when the playlist html has been rendered
+  click: false // plugin callback
 };
 
 Tube.parameters = {
@@ -131,20 +131,20 @@ Tube.prototype.load = function (callback) {
       proxy = function (status, error) {
         if (status === 0) {
           if (callback && $.isFunction(callback)) {
-  	        callback.apply(self, [success, error]);
-  	      }
-  				self.notify('error');
+            callback.apply(self, [success, error]);
+          }
+          self.notify('error');
         }
 
         // Call the fallback only when all videos have loaded
         if (++success >= self.options.list.length) {
           self.notify('load');
 
-  	      if (callback && $.isFunction(callback)) {
-  	        callback.apply(self, [success]);
-  	      }
+          if (callback && $.isFunction(callback)) {
+            callback.apply(self, [success]);
+          }
 
-  	      self.notify('ready');
+          self.notify('ready');
         }
       };
 
@@ -158,33 +158,33 @@ Tube.prototype.load = function (callback) {
       // Regular YouTube queries
 
       $.getJSON(this.request(), function (data) {
-  			try {
-  	      success = data.feed.entry.length;
+        try {
+          success = data.feed.entry.length;
 
-  	      self.videos = $.map(data.feed.entry, function(item) {
-  	        return new Video().parse(item);
-  	      });
+          self.videos = $.map(data.feed.entry, function(item) {
+            return new Video().parse(item);
+          });
 
-  				if (success && (self.options.autoload || self.options.start)) {
-  					self.current = Math.min(self.videos.length - 1, Math.max(0, self.options.start - 1));
-  					self.player.load(self.videos[self.current]);
-  				}
+          if (success && (self.options.autoload || self.options.start)) {
+            self.current = Math.min(self.videos.length - 1, Math.max(0, self.options.start - 1));
+            self.player.load(self.videos[self.current]);
+          }
 
-  	      self.notify('load');
+          self.notify('load');
 
-  	      if (callback && $.isFunction(callback)) {
-  	        callback.apply(self, [success]);
-  	      }
+          if (callback && $.isFunction(callback)) {
+            callback.apply(self, [success]);
+          }
 
-  	      self.notify('ready');
-  			}
-  			catch (error) {
-  				if (callback && $.isFunction(callback)) {
-  	        callback.apply(self, [0, error]);
-  	      }
+          self.notify('ready');
+        }
+        catch (error) {
+          if (callback && $.isFunction(callback)) {
+            callback.apply(self, [0, error]);
+          }
 
-  				self.notify('error');
-  			}
+          self.notify('error');
+        }
       });
     }
 
@@ -215,11 +215,11 @@ Tube.prototype.parameters = function () {
 
   // adapt playlist specific parameters
   if (this.options.playlist) {
-		delete parameters.orderby;
+    delete parameters.orderby;
   }
-	else if (this.options.user) {
-		parameters.orderby = 'published';
-	}
+  else if (this.options.user) {
+    parameters.orderby = 'published';
+  }
 
   parameters.alt      = 'json-in-script';
   parameters.callback = '?';
@@ -237,9 +237,9 @@ Tube.prototype.request = function (options) {
   if (this.options.playlist) {
     api += 'playlists/' + this.options.playlist.replace(/^PL/, '');
   }
-	else if (this.options.user) {
+  else if (this.options.user) {
     api += ['users', this.options.user, 'uploads'].join('/');
-	}
+  }
   else {
     api += 'videos';
   }
@@ -256,64 +256,64 @@ Tube.prototype.authenticate = function () {
  * If no index is given, resumes the current video.
  */
 Tube.prototype.play = function (index) {
-	if ($.isNumeric(index)) {
-		var k = index % this.videos.length;
-		this.current = (k < 0) ? this.videos.length - k : k;
+  if ($.isNumeric(index)) {
+    var k = index % this.videos.length;
+    this.current = (k < 0) ? this.videos.length - k : k;
 
-		if (this.player && this.videos.length) {
-			this.player.play(this.videos[this.current]);
-		}
-	}
-	else {
-		this.player.resume();
-	}
+    if (this.player && this.videos.length) {
+      this.player.play(this.videos[this.current]);
+    }
+  }
+  else {
+    this.player.resume();
+  }
 
-	return this;
+  return this;
 };
 
 /** Pauses playback of the current player */
 Tube.prototype.pause = function (index) {
-	if (this.player) {
-		this.player.pause();
-	}
-	return this;
+  if (this.player) {
+    this.player.pause();
+  }
+  return this;
 };
 
 Tube.prototype.stop = function (index) {
-	if (this.player) {
-		this.player.stop();
-		this.notify('stop');
-	}
-	return this;
+  if (this.player) {
+    this.player.stop();
+    this.notify('stop');
+  }
+  return this;
 };
 
 /** Plays the next video. */
 Tube.prototype.next = function () {
-	return this.advance(1).notify('next');
+  return this.advance(1).notify('next');
 };
 
 /** Plays the previous video. */
 Tube.prototype.previous = function () {
-	return this.advance(-1).notify('previous');
+  return this.advance(-1).notify('previous');
 };
 
 Tube.prototype.advance = function (by) {
-	return this.play(this.current + (by || 1));
+  return this.play(this.current + (by || 1));
 };
 
 Tube.prototype.render_options = function (options) {
-	return $.extend({}, Video.defaults, this.options, options || {});
+  return $.extend({}, Video.defaults, this.options, options || {});
 };
 
 /** Returns the video as an HTML string */
 Tube.prototype.render = function () {
-	var templates = this.options.templates, options = this.render_options();
-	var elements = $.map(this.videos, function (video, index) {
-		options.index = index;
-		return '<li>' + video.render(templates, options) + '</li>';
-	});
+  var templates = this.options.templates, options = this.render_options();
+  var elements = $.map(this.videos, function (video, index) {
+    options.index = index;
+    return '<li>' + video.render(templates, options) + '</li>';
+  });
 
-	return '<ol>' + elements.join('') + '</ol>';
+  return '<ol>' + elements.join('') + '</ol>';
 };
 
 

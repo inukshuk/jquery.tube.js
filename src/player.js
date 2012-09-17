@@ -14,8 +14,8 @@ var Player = function (options) {
 
   // Handle YouTube's state change events and dispatch using our taxonomy
   this.on('state', function (name, event) {
-		var state = $.isNumeric(event) ? event : (event && event.data);
-		
+    var state = $.isNumeric(event) ? event : (event && event.data);
+
      switch (state) {
        case -1:
          this.notify('unstarted');
@@ -40,32 +40,32 @@ var Player = function (options) {
        // ignore
      }
   });
-  
-	// Register event handlers set in options
-	$.each(Player.events, function (idx, event) {
-	  if (self.options.events[event]) {
+
+  // Register event handlers set in options
+  $.each(Player.events, function (idx, event) {
+    if (self.options.events[event]) {
       self.on(event, self.options.events[event]);
     }
-	});
+  });
 };
 
 Player.create = function (options) {
-	var dom, player;
-	
-	options = $.extend({}, Player.defaults, options);
+  var dom, player;
 
-	// Resolve player's id
-	options.id = resolve_player_id(options.id);
-  
-	dom = $('#' + options.id);
-	player = dom.data('player');
-	
-	if (!player) {
-		player = new Player(options);
-		dom.data('player', player);
-	}
+  options = $.extend({}, Player.defaults, options);
 
-	return player;
+  // Resolve player's id
+  options.id = resolve_player_id(options.id);
+
+  dom = $('#' + options.id);
+  player = dom.data('player');
+
+  if (!player) {
+    player = new Player(options);
+    dom.data('player', player);
+  }
+
+  return player;
 };
 
 Player.constants = {
@@ -85,7 +85,7 @@ Player.defaults = {
   width: 640,
   height: 390,
   wmode: 'opaque',
-	events: {},
+  events: {},
   playerVars: {
     autohide: 2, // 0 = always visible, 1 = hide progress bar and controls, 2 = hide progress bar
     autoplay: 0,
@@ -106,12 +106,12 @@ Player.events = ['unstarted', 'end', 'play', 'cue', 'buffer', 'pause', 'error'];
 
 // Allow us to pass in CSS selectors and resolve the element's id
 var resolve_player_id = function (id) {
-	if ((/^#|\./).test(id)) {
-		return $(id).attr('id') || id;
-	}
-	else {
-		return id;
-	}
+  if ((/^#|\./).test(id)) {
+    return $(id).attr('id') || id;
+  }
+  else {
+    return id;
+  }
 };
 
 
@@ -134,7 +134,7 @@ Player.prototype.play = function (video) {
   else {
     this.p.playVideo();
   }
-  
+
   return this;
 };
 
@@ -164,7 +164,7 @@ Player.prototype.seek = function (to, seek_ahead) {
     if (undefined === seek_ahead) {
       seek_ahead = true;
     }
-    
+
     this.p.seekTo(to, seek_ahead);
   }
   return this;
@@ -181,7 +181,7 @@ Player.prototype.clear = function () {
 /* Returns the current video or null */
 Player.prototype.current_video = function (callback) {
   var video = this.p && this.p.current_video;
-  
+
   if (video && !video.id) {
     // this.video is not a video object, so we assume it is a YouTube ID
     this.video = (new Video()).load(video, callback);
@@ -202,48 +202,48 @@ if ($.isFunction(window.postMessage) && !$.browser.msie) {
 
   // Use the iFrame API
   // https://code.google.com/apis/youtube/iframe_api_reference.html
-  
+
   Player.api = 'iframe';
   Player.constants.api = 'https://www.youtube.com/player_api';
 
 
-	Player.prototype.event_proxy_for = function (event) {
-	  return $.proxy(this.notify, this, event);
-	};
+  Player.prototype.event_proxy_for = function (event) {
+    return $.proxy(this.notify, this, event);
+  };
 
-  
+
   Player.load = function (callback) {
     if (typeof YT === 'undefined') {
       var tag = document.createElement('script');
-    
+
       if ($.isFunction(callback)) {
         Player.callbacks.push(callback);
       }
 
-			// Use semaphore to make sure we load the API just once
-			if (Player.semaphore === 0) {
-				Player.semaphore = 1;
-				
-	      tag.src = Player.constants.api;
-	      $('script:first').before(tag);
-			}
+      // Use semaphore to make sure we load the API just once
+      if (Player.semaphore === 0) {
+        Player.semaphore = 1;
+
+        tag.src = Player.constants.api;
+        $('script:first').before(tag);
+      }
 
       return false;
     }
-    
+
     if ($.isFunction(callback)) {
       setTimeout(callback, 0);
     }
 
     return true;
   };
-  
+
   Player.prototype.load = function (video) {
     var self = this, options = $.extend({}, this.options, { videoId: video.id || video, events: {} }),
       dom = $('#' + options.id);
 
     Player.load(function () {
-      try {					
+      try {
         // Map YouTube native events to our own events
         $.each(Player.constants.events, function (key, value) {
           options.events[key] = self.event_proxy_for(value);
@@ -265,94 +265,94 @@ if ($.isFunction(window.postMessage) && !$.browser.msie) {
     return this;
   };
 
-	// YouTube API's initial callback
-	window.onYouTubePlayerAPIReady = function () {
-	  $.each(Player.callbacks, function () {
-	    this.call();
-	  });
-	};
+  // YouTube API's initial callback
+  window.onYouTubePlayerAPIReady = function () {
+    $.each(Player.callbacks, function () {
+      this.call();
+    });
+  };
 
 }
 else {
-  
+
   // Use the JavaScript API
   // https://code.google.com/apis/youtube/js_api_reference.html
   // https://code.google.com/p/swfobject/
-  
+
   Player.api = 'js';
   Player.constants.api = '//www.youtube.com/v/{video}?enablejsapi=1&playerapiid={id}&version=3';
   Player.constants.swf_version = '8';
 
   Player.defaults.playerVars.autoplay = 1;
-  
-	// Workaround:
-	// The JavaScript API can register event handlers only as strings. Therefore,
-	// we need to set up a global proxy for each player instance.
-	Player.prototype.event_proxy_for = function (event) {
-		var self = this, id = this.options.id.replace(/[\s-]/g, '_'),
-			proxy = ['event_proxy_for_player', id, event].join('_');
 
-		window[proxy] = function () {
-			var args = Array.prototype.slice.apply(arguments);
-			
-			args.unshift(event);
-			self.notify.apply(self, args);
-		};			
-		
-		return proxy;
-	};
+  // Workaround:
+  // The JavaScript API can register event handlers only as strings. Therefore,
+  // we need to set up a global proxy for each player instance.
+  Player.prototype.event_proxy_for = function (event) {
+    var self = this, id = this.options.id.replace(/[\s-]/g, '_'),
+      proxy = ['event_proxy_for_player', id, event].join('_');
+
+    window[proxy] = function () {
+      var args = Array.prototype.slice.apply(arguments);
+
+      args.unshift(event);
+      self.notify.apply(self, args);
+    };
+
+    return proxy;
+  };
 
   Player.load = function (callback) {
     if (typeof swfobject === 'undefined') {
-				
-			$.getScript(Player.constants.swfobject, function () {
+
+      $.getScript(Player.constants.swfobject, function () {
         if ($.isFunction(callback)) {
           callback.call();
         }
-			});
-	  
+      });
+
       return false;
     }
-  
-  	// Execute the callback (non-blocking)
+
+    // Execute the callback (non-blocking)
     if ($.isFunction(callback)) {
       setTimeout(callback, 0);
-    }     
+    }
 
     return true;
   };
-  
+
   Player.prototype.load = function (video) {
     var self = this, options = $.extend({}, this.options, { videoId: video.id || video, events: {} }),
-			dom = $('#' + options.id);
+      dom = $('#' + options.id);
 
     Player.load(function () {
       try {
         Player.callbacks.push(function (id) {
-					self.p = document.getElementById(id);
+          self.p = document.getElementById(id);
 
           // Register event proxies
           $.each(Player.constants.events, function (key, value) {
-            self.p.addEventListener(key, self.event_proxy_for(value));	
+            self.p.addEventListener(key, self.event_proxy_for(value));
           });
 
           // Save the current video
           if (video) {
             self.p.current_video = video;
           }
-				});
+        });
 
-				swfobject.embedSWF(
-					Player.constants.api.supplant({ video: options.videoId, id: options.id }),
-					options.id,
-					options.width,
-					options.height,
-					Player.constants.swf_version,
-					null,
-					options.playerVars,
-					{ allowScriptAccess: 'always', wmode: 'opaque' },
-					{ id: options.id }
-				);        
+        swfobject.embedSWF(
+          Player.constants.api.supplant({ video: options.videoId, id: options.id }),
+          options.id,
+          options.width,
+          options.height,
+          Player.constants.swf_version,
+          null,
+          options.playerVars,
+          { allowScriptAccess: 'always', wmode: 'opaque' },
+          { id: options.id }
+        );
       }
       catch (error) {
         console.log('Failed to load YouTube player: ', error);
@@ -363,13 +363,13 @@ else {
     return this;
   };
 
-	window.onYouTubePlayerReady = function () {
-		var args = arguments;
-		
-		$.each(Player.callbacks, function () {
-			this.apply(window, args);
-		});
-	};
+  window.onYouTubePlayerReady = function () {
+    var args = arguments;
+
+    $.each(Player.callbacks, function () {
+      this.apply(window, args);
+    });
+  };
 
 }
 
