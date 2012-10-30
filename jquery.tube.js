@@ -255,7 +255,8 @@
         if (media.media$thumbnail && $.isArray(media.media$thumbnail)) {
           this.thumbnails = $.map(media.media$thumbnail, function (image) {
             return {
-              width: image.width, height: image.height, url: image.url, name: image.yt$name
+              width: image.width, height: image.height,
+              url: image.url.replace(/^https?:\/\//, '//'), name: image.yt$name
             };
           });
         }
