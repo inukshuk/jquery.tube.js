@@ -1,0 +1,36 @@
+{
+	"name": "jquery.tube",
+	"title": "jQuery Tube",
+	"description": "jQuery Plugin to access YouTube's Data and Player API",
+	"version": "0.2.0",
+	"homepage": "http://inukshuk.github.com/jquery.tube.js/",
+	"author": {
+		"name": "Sylvester Keil",
+		"url": "http://sylvester.keil.or.at/"
+	},
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/inukshuk/jquery.tube.js.git"
+	},
+	"bugs": {
+		"url": "https://github.com/inukshuk/jquery.tube.js/issues"
+	},
+	"licenses": [
+		{
+			"type": "MIT",
+			"url": "https://raw.github.com/inukshuk/jquery.tube.js/master/LICENSE"
+		}
+	],
+	"scripts": {
+	  "test": "mocha test/runner.js"
+	},
+	"dependencies": {
+		"jquery": ">=1.7.1"
+	},
+	"devDependencies": {
+		"jsdom": "~0.2.19",
+		"mocha": "~1.6.0",
+		"should": "~1.2.1"
+	},
+	"keywords": ["jQuery", "YouTube"]
+}

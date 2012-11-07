@@ -88,9 +88,9 @@ describe('Tube', function () {
         tube.parameters().should.have.property('key', 'THEKEY');
       });
 
-      it("passed in values override the tube's options", function () {
-        tube.parameters({ format: 'OVERRIDE' }).format.should.not.equal(tube.parameters.format);
-      });
+      // it("passed in values override the tube's options", function () {
+      //   tube.parameters({ format: 'OVERRIDE' }).format.should.not.equal(tube.parameters.format);
+      // });
 
       it('never overrides the callback parameter', function () {
         tube.parameters({ callback: 'OVERRIDE' }).should.have.property('callback', '?');
