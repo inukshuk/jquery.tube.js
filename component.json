@@ -1,0 +1,17 @@
+{
+	"name": "jquery.tube",
+	"title": "jQuery Tube",
+	"description": "jQuery Plugin to access YouTube's Data and Player API",
+	"version": "0.2.0",
+	"author": {
+		"name": "Sylvester Keil",
+		"url": "http://sylvester.keil.or.at/"
+	},
+	"main": [
+		"jquery.tube.js",
+		"jquery.tube.min.js"
+	],
+	"dependencies": {
+		"jquery": ">=1.7.1"
+	}
+}
