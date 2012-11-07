@@ -7,9 +7,7 @@
 
     <link rel="stylesheet" href="stylesheets/styles.css">
     <link rel="stylesheet" href="stylesheets/pygment_trac.css">
-    <script src="javascripts/scale.fix.js"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
-
     <!--[if lt IE 9]>
     <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
     <![endif]-->
@@ -18,8 +16,11 @@
     <div class="wrapper">
       <header>
         <h1>Jquery.tube.js</h1>
-<p>jQuery plugin for accessing YouTube's player and data APIs</p>
+        <p>jQuery plugin for accessing YouTube's player and data APIs</p>
+
         <p class="view"><a href="https://github.com/inukshuk/jquery.tube.js">View the Project on GitHub <small>inukshuk/jquery.tube.js</small></a></p>
+
+
         <ul>
           <li><a href="https://github.com/inukshuk/jquery.tube.js/zipball/master">Download <strong>ZIP File</strong></a></li>
           <li><a href="https://github.com/inukshuk/jquery.tube.js/tarball/master">Download <strong>TAR Ball</strong></a></li>
@@ -43,6 +44,17 @@ browsers (IE7) and HTML5 capable devices without Flash support.</p>
 <p>This plugin contains no stylesheets; tube instances create simple HTML
 lists of their contents (the structure can be adjusted for each instance
 through a simple template system).</p>
+
+<h3>Installation</h3>
+
+<p>Simply grab <code>jquery.tube.js</code> or <code>jquery.tube.min.js</code> from the project's
+root directory. For <a href="http://twitter.github.com/bower/">bower</a> users simply
+run:</p>
+
+<pre><code>$ bower install jquery.tube
+</code></pre>
+
+<p>Or add "jquery.tube" as a dependency to your <code>component.json</code> file.</p>
 
 <h3>Documentation</h3>
 
@@ -94,16 +106,15 @@ directories.</p>
 framework for testing; in order to run the tests you need to install a
 few libraries through npm:</p>
 
-<pre><code>$ npm install -g mocha
-$ npm install -g should
-$ npm install jsdom
-$ npm install jquery
-$ rake test
+<pre><code>$ npm install
+$ npm test
 </code></pre>
 
-<p>There is also a Rakefile that makes it easy to build and minify the plugin:</p>
+<p>If you customize any of Tube's components, you can build a new version of
+the plugin as follows:</p>
 
-<pre><code>$ rake build minify
+<pre><code>$ bundle install
+$ rake build minify
 </code></pre>
 
 <h3>License</h3>
@@ -130,12 +141,12 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.</p>
       </section>
+      <footer>
+        <p>This project is maintained by <a href="https://github.com/inukshuk">inukshuk</a></p>
+        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></small></p>
+      </footer>
     </div>
-    <footer>
-      <p>Project maintained by <a href="https://github.com/inukshuk">inukshuk</a></p>
-      <p>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></p>
-    </footer>
-    <!--[if !IE]><script>fixScale(document);</script><!--<![endif]-->
+    <script src="javascripts/scale.fix.js"></script>
     
   </body>
 </html>
