@@ -37,10 +37,6 @@ def normalize(text, tab = '  ', indent = 1)
   text.gsub(/^if\s*\(exports\).*/m, '').gsub(/\t/, tab).gsub(/^/, tab * indent)
 end
 
-task :test do
-	system 'mocha test/runner.js'
-end
-
 task :build do
   File.open('jquery.tube.js', 'w') do |f|
     f.puts FULL_LICENSE

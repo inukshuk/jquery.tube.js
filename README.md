@@ -26,12 +26,14 @@ This plugin uses the awesome [mocha](https://github.com/visionmedia/mocha)
 framework for testing; in order to run the tests you need to install a
 few libraries through npm:
 
-    $ npm install -g mocha
-    $ npm install -g should
-    $ npm install jsdom
-    $ npm install jquery
-    $ rake test
+    $ npm install
+    $ npm test
 
+If you customize any of Tube's components, you can build a new version of
+the plugin as follows:
+
+    $ bundle install
+    $ rake build minify
 
 License
 -------

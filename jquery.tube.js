@@ -1,5 +1,5 @@
 /*!
- * jquery.tube.js 0.1.0
+ * jquery.tube.js 0.2.0
  * Copyright (c) 2012 Sylvester Keil, Thomas Egger.
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a
@@ -1188,4 +1188,4 @@
   $.player = {};
   $.player.defaults = Player.defaults;
   $.player.counter = 0;
-}(jQuery, window, window.document, '0.1.0'));
+}(jQuery, window, window.document, '0.2.0'));
