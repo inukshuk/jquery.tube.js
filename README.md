@@ -17,6 +17,16 @@ This plugin contains no stylesheets; tube instances create simple HTML
 lists of their contents (the structure can be adjusted for each instance
 through a simple template system).
 
+Installation
+------------
+Simply grab `jquery.tube.js` or `jquery.tube.min.js` from the project's
+root directory. For [bower](http://twitter.github.com/bower/) users simply
+run:
+
+    $ bower install jquery.tube
+
+Or add "jquery.tube" as a dependency to your `component.json` file.
+
 Documentation
 -------------
 For the time being, consult the examples in the `demo` and `test`

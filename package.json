@@ -32,5 +32,9 @@
 		"mocha": "~1.6.0",
 		"should": "~1.2.1"
 	},
+	"files": [
+		"jquery.tube.js",
+		"jquery.tube.min.js"
+	],
 	"keywords": ["jQuery", "YouTube"]
 }

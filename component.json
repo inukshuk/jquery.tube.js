@@ -7,9 +7,10 @@
 		"name": "Sylvester Keil",
 		"url": "http://sylvester.keil.or.at/"
 	},
-	"main": [
-		"jquery.tube.js",
-		"jquery.tube.min.js"
+	"main": "./jquery.tube.js",
+	"files": [
+		"./jquery.tube.js",
+		"./jquery.tube.min.js"
 	],
 	"dependencies": {
 		"jquery": ">=1.7.1"
