@@ -1,5 +1,8 @@
 jquery.tube.js
 ==============
+
+[![Build Status](https://secure.travis-ci.org/inukshuk/jquery.tube.js.png)](http://travis-ci.org/inukshuk/jquery.tube.js)
+
 Tube is a jQuery plugin to access YouTube's player and data APIs
 transparently. The basic approach is centered around 'tube' objects: a
 tube is an abstract container filled with videos based on a YouTube
