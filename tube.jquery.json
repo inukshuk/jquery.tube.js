@@ -18,7 +18,7 @@
 		}
 	],
 	"bugs": "https://github.com/inukshuk/jquery.tube.js/issues",
-	"homepage": "https://github.com/inukshuk/jquery.tube.js",
+	"homepage": "http://inukshuk.github.com/jquery.tube.js/",
 	"dependencies": {
 		"jquery": ">=1.7"
 	}
