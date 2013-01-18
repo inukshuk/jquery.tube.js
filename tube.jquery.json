@@ -1,12 +1,12 @@
 {
 	"name": "tube",
 	"title": "jQuery Tube",
-	"description": "jQuery Plugin to access YouTube's Data and Player API",
+	"description": "jQuery Plugin to access YouTube's Data and Player API (covers HTML5 and Flash version transparently).",
 	"keywords": [
 		"YouTube",
-		"Video"
+		"video"
 	],
-	"version": "0.2.1",
+	"version": "0.2.2",
 	"author": {
 		"name": "Sylvester Keil",
 		"url": "http://sylvester.keil.or.at/"
