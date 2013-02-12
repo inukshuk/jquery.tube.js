@@ -68,7 +68,7 @@ var format_date = function (date) {
     return date;
   }
 
-  return [date.getDate(), date.getMonth(), date.getFullYear()].join('.');
+  return [date.getDate(), date.getMonth() + 1, date.getFullYear()].join('.');
 };
 
 /** Video Instance Methods */
