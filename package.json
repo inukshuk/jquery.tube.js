@@ -2,7 +2,7 @@
 	"name": "jquery.tube",
 	"title": "jQuery Tube",
 	"description": "jQuery Plugin to access YouTube's Data and Player API",
-	"version": "0.2.0",
+	"version": "0.2.3",
 	"homepage": "http://inukshuk.github.com/jquery.tube.js/",
 	"author": {
 		"name": "Sylvester Keil",
