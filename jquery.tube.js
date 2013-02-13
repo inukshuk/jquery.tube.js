@@ -1,5 +1,5 @@
 /*!
- * jquery.tube.js 0.2.4
+ * jquery.tube.js 0.2.5
  * Copyright (c) 2013 Sylvester Keil, Thomas Egger.
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a
@@ -395,7 +395,7 @@
     this.current = 0;
     this.player = Player.create(this.player_options());
   
-    this.options.templates = $.extend(Video.templates, this.options.templates || {});
+    this.options.templates = $.extend({}, Video.templates, this.options.templates || {});
   
     observable.apply(this);
   
@@ -581,11 +581,11 @@
   Tube.prototype.player_options = function () {
     return {
       id: this.options.player,
-      playerVars: $.extend({
+      playerVars: $.extend({}, Player.parameters, {
         autoplay: this.options.autoplay,
         autohide: this.options.hide,
         controls: this.options.controls
-      }, Player.defaults)
+      })
     };
   };
   
@@ -1192,4 +1192,4 @@
   $.player = {};
   $.player.defaults = Player.defaults;
   $.player.counter = 0;
-}(jQuery, window, window.document, '0.2.4'));
+}(jQuery, window, window.document, '0.2.5'));
