@@ -287,7 +287,7 @@ else {
   Player.constants.api = '//www.youtube.com/v/{video}?enablejsapi=1&playerapiid={id}&version=3';
   Player.constants.swf_version = '8';
 
-  Player.defaults.playerVars.autoplay = 1;
+  Player.parameters.autoplay = 1;
 
   // Workaround:
   // The JavaScript API can register event handlers only as strings. Therefore,
