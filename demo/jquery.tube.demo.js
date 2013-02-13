@@ -6,7 +6,7 @@
 	
 	$(function () {
 		
-		$('#player-1').player({ video: 'MHHw-kEEGUo', events: { end: event_handler, play: event_handler, pause: event_handler } });
+		$('#player-1').player({ video: 'MHHw-kEEGUo', playerVars: { start: 50 }, events: { end: event_handler, play: event_handler, pause: event_handler } });
 		
     // $('#tube-1').tube({ player: 'player-2', user: 'CTBTO', thumbnail: 'hqdefault', autoplay: true, limit: 5, start: 3, controls: 1, hide: 1,
     //   events: { load: event_handler, play: event_handler, pause: event_handler,

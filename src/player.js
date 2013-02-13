@@ -53,10 +53,12 @@ Player.create = function (options) {
   var dom, player;
 
   options = $.extend({}, Player.defaults, options);
+  options.playerVars = $.extend(Player.parameters, options.playerVars || {});
 
   // Resolve player's id
   options.id = resolve_player_id(options.id);
 
+  // copy 
   dom = $('#' + options.id);
   player = dom.data('player');
 
@@ -85,15 +87,17 @@ Player.defaults = {
   width: 640,
   height: 390,
   wmode: 'opaque',
-  events: {},
-  playerVars: {
-    autohide: 2, // 0 = always visible, 1 = hide progress bar and controls, 2 = hide progress bar
-    autoplay: 0,
-    controls: 1,
-    enablejsapi: 1,
-    loop: 0,
-    modestbranding: 1
-  }
+  events: {}
+};
+
+Player.parameters = {
+  autohide: 2, // 0 = always visible, 1 = hide progress bar and controls, 2 = hide progress bar
+  autoplay: 0,
+  controls: 1,
+  start: 0,
+  enablejsapi: 1,
+  loop: 0,
+  modestbranding: 1
 };
 
 Player.callbacks = [];
