@@ -9,7 +9,7 @@ var Tube = function (options) {
   this.current = 0;
   this.player = Player.create(this.player_options());
 
-  this.options.templates = $.extend(Video.templates, this.options.templates || {});
+  this.options.templates = $.extend({}, Video.templates, this.options.templates || {});
 
   observable.apply(this);
 
@@ -195,11 +195,11 @@ Tube.prototype.load = function (callback) {
 Tube.prototype.player_options = function () {
   return {
     id: this.options.player,
-    playerVars: $.extend({
+    playerVars: $.extend({}, Player.parameters, {
       autoplay: this.options.autoplay,
       autohide: this.options.hide,
       controls: this.options.controls
-    }, Player.defaults)
+    })
   };
 };
 

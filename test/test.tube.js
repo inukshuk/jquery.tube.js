@@ -71,6 +71,14 @@ describe('Tube', function () {
       tube = new Tube();
     });
 
+		describe('templates are unique across instances', function () {
+			var t1 = new Tube({ templates: { description: 'FOO' }});
+			var t2 = new Tube({ templates: { description: 'BAR' }});
+			
+			t1.options.templates.description.should.equal('FOO');
+			t2.options.templates.description.should.equal('BAR');
+		});
+
     describe('#parameters', function () {
       it('returns the default options by default', function () {
         var parameters = tube.parameters();
