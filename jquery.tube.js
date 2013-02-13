@@ -1,5 +1,5 @@
 /*!
- * jquery.tube.js 0.2.2
+ * jquery.tube.js 0.2.4
  * Copyright (c) 2013 Sylvester Keil, Thomas Egger.
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a
@@ -992,7 +992,7 @@
     Player.constants.api = '//www.youtube.com/v/{video}?enablejsapi=1&playerapiid={id}&version=3';
     Player.constants.swf_version = '8';
   
-    Player.defaults.playerVars.autoplay = 1;
+    Player.parameters.autoplay = 1;
   
     // Workaround:
     // The JavaScript API can register event handlers only as strings. Therefore,
@@ -1192,4 +1192,4 @@
   $.player = {};
   $.player.defaults = Player.defaults;
   $.player.counter = 0;
-}(jQuery, window, window.document, '0.2.2'));
+}(jQuery, window, window.document, '0.2.4'));
