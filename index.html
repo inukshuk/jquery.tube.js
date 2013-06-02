@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="chrome=1">
-    <title>Jquery.tube.js by inukshuk</title>
+    <title>jquery.tube.js</title>
 
     <link rel="stylesheet" href="stylesheets/styles.css">
     <link rel="stylesheet" href="stylesheets/pygment_trac.css">
@@ -11,15 +11,17 @@
     <!--[if lt IE 9]>
     <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
     <![endif]-->
+    
+    <script src="http://code.jquery.com/jquery-1.8.3.min.js"></script>
+    <script src="https://raw.github.com/inukshuk/jquery.tube.js/master/jquery.tube.min.js"></script>
   </head>
   <body>
     <div class="wrapper">
       <header>
-        <h1>Jquery.tube.js</h1>
+        <h1>jquery.tube.js</h1>
         <p>jQuery plugin for accessing YouTube's player and data APIs</p>
 
         <p class="view"><a href="https://github.com/inukshuk/jquery.tube.js">View the Project on GitHub <small>inukshuk/jquery.tube.js</small></a></p>
-
 
         <ul>
           <li><a href="https://github.com/inukshuk/jquery.tube.js/zipball/master">Download <strong>ZIP File</strong></a></li>
@@ -61,8 +63,14 @@ run:</p>
 <p>If all you want to do is play a video, you can create a new player instance
 with a YouTube video ID:</p>
 
-<pre><code>$('#player-container').player({ video: 'ylLzyHk54Z0' });
+<pre><code>$('#player-container').player({
+  video: 'ylLzyHk54Z0',
+  width: 500
+});
 </code></pre>
+
+<div id="example-1" class="example"></div>
+<script>$('#example-1').player({ video: 'ylLzyHk54Z0', width: $('.wrapper > section').width() });</script>
 
 <p>You can pass more options to set up event handlers or specific YouTube configuration
 options; you can retrieve the player object using jQuery's data method, like this:</p>
@@ -70,20 +78,63 @@ options; you can retrieve the player object using jQuery's data method, like thi
 <pre><code>$('#player-container').data('player');
 </code></pre>
 
+<p>Additionally, the player object is exposed as 'this' to every event handler
+you register. To gain access to the original YouTube player object use the property 'p'
+of the player object. To illustrate this, the following example prints the current
+time to the console twice a second while the video is playing.</p>
+
+<pre><code>function onPlay(event) {
+ var player = this;
+ 
+ timeout = setInterval(function () {
+   console.log(player.p.getCurrentTime());
+ }, 500); 
+}
+
+function onPause(event) {
+  clearInterval(timeout);
+}
+
+$('#player-container').player({
+  video: 'ylLzyHk54Z0'
+  events: {
+    play: onPlay,
+    stop: onPause,
+    end: onPause
+  }
+});
+</code></pre>
+
+<p>You can register event handlers for these events:</p>
+
+<ul>
+  <li>unstarted</li>
+  <li>play</li>
+  <li>pause</li>
+  <li>end</li>
+  <li>buffer</li>
+  <li>cue</li>
+</ul>
+
 <p>More interesting than the player object, however, are tube objects. A tube is
 basically a bunch of videos based on either a user's feed, a specific playlist,
 or a search query on YouTube. For example:</p>
 
 <pre><code>$('#playlist-container-1').tube({
   player: 'player-container',
-  query: 'lolcats',
-  limit: 5
+  query: 'alan turing',
+  limit: 5,
+  width: 500
 });
 </code></pre>
 
-<p>This will display five cat videos (just what the world needs) in the
+<p>This will display five videos about Alan Turing in the
 'playlist-container-1'; if you click on any of the videos the video will
-start playing in a new player instance created in 'player-container'.</p>
+start playing in a new player instance created inside the 'player-container'.</p>
+
+<div id="example-2-container" class="example"></div>
+<div id="example-2" class="example"></div>
+<script>$('#example-2').tube({ player: 'example-2-container', query: 'alan turing', limit: 5, width: $('.wrapper > section').width() });</script>
 
 <p>Next, you could add a second playlist whose videos will play back in
 the same player instance:</p>
@@ -95,10 +146,75 @@ the same player instance:</p>
 });
 </code></pre>
 
-<p>This will add the latest five videos uploaded by the user GoogleDevelopers.</p>
+<p>This will add the latest five videos uploaded by the user GoogleDevelopers.
+In this way you can add multiple playlists that share a single video player.</p>
+
+<div id="example-3" class="example"></div>
+<script>$('#example-3').tube({ player: 'example-2-container', user: 'GoogleDevelopers', limit: 5 });</script>
+
+<p>You can also create arbitrary playlists on the fly by passing a list of
+YouTube IDs. The next example will reuse the same player again:</p>
+
+<pre><code>$('#playlist-container-3').tube({
+  player: 'player-container',
+  list: ['sOEAD-gfJ_M', 'u1zgFlCw8Aw']
+});
+</code></pre>
+
+<div id="example-4" class="example"></div>
+<script>$('#example-4').tube({ player: 'example-2-container', list: ['sOEAD-gfJ_M', 'u1zgFlCw8Aw'] });</script>
+
+<p>If you want to adapt the HTML of the generated tubes, you can do so by defining
+in a template configuration. The default configuration looks like this:</p>
+
+<pre><code>templates = {
+  thumbnail: '&lt;img src="{url}" title="{title}" /&gt;',
+  title: '&lt;h1&gt;{title} ({duration})&lt;/h1&gt;',
+  author: '&lt;a href="{author_url}"&gt;{author}&lt;/a&gt;',
+  description: '&lt;p&gt;{description}&lt;/p&gt;',
+  statistics: '&lt;span class="statistics"&gt;{views} / {favorites} / {uploaded}&lt;/span&gt;',
+  video: '&lt;a href="#{id}" rel="{index}"&gt;{title}{thumbnail}{description}&lt;p&gt;{author} – {statistics}&lt;/p&gt;&lt;/a&gt;'
+};
+</code></pre>
 
 <p>For more examples, consult the examples in the <code>demo</code> and <code>test</code>
 directories.</p>
+
+<h3>Configuration</h3>
+
+<p>For the default configuration of the player and tube plugins you can
+take a look at '$.tube.defaults' and '$.player.defaults':</p>
+
+<pre><code>$.tube.defaults = {
+  player: 'player',
+  autoload: false, // load the player automatically?
+  autoplay: false,
+  start: 0, // start video at offset
+  order: 'relevance', // 'published', 'rating', 'viewCount'
+  author: false,
+  hide: 2, // 0 = always visible, 1 = hide progress bar and controls, 2 = hide progress bar
+  controls: 1,
+  version: 2,
+  format: 5,
+  limit: 10,
+  key: false,
+  render: true,
+  truncate: false,
+  at: '\n', // pattern (truncate)
+  max: 140, // max length (truncate)
+  omission: '…', // omission string (truncate)
+  load: false, // plugin callback when the playlist data has been loaded
+  complete: false, // plugin callback when the playlist html has been rendered
+  click: false // plugin callback
+};
+
+$.player.defaults = {
+  id: 'player',
+   width: 640,
+   height: 390,
+   wmode: 'opaque'
+};
+</code></pre>
 
 <h3>Development</h3>
 
@@ -121,7 +237,7 @@ $ rake build minify
 
 <p>(The MIT License)</p>
 
-<p>Copyright (c) 2012 Sylvester Keil, Thomas Egger.</p>
+<p>Copyright (c) 2012-2013 Sylvester Keil, Thomas Egger.</p>
 
 <p>Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -147,6 +263,6 @@ SOFTWARE.</p>
       </footer>
     </div>
     <script src="javascripts/scale.fix.js"></script>
-    
+
   </body>
 </html>
