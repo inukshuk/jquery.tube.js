@@ -253,3 +253,18 @@ footer {
     color:#444;
   }
 }
+
+.example ol {
+	list-style: none;
+	margin-left: 0;
+}
+
+.example ol li {
+	display: block;
+	width: 250px;
+	float: left;
+}
+
+.example ol h1 {
+	font-size: 12px;
+}
