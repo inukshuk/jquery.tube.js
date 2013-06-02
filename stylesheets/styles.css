@@ -275,6 +275,11 @@ p, pre, .example {
 	float: left;
 }
 
+.example ol h1 {
+	height: 55px;
+	margin-bottom: 0;
+}
+
 .example ol h1, .example ol a, .example ol .statistics {
 	font-size: 12px;
 }
