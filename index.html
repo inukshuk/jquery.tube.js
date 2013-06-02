@@ -123,18 +123,18 @@ or a search query on YouTube. For example:</p>
 <pre><code>$('#playlist-container-1').tube({
   player: 'player-container',
   autoload: true,
-  query: 'alan turing',
-  limit: 5
+  query: 'Alan Turing',
+  limit: 4
 });
 </code></pre>
 
-<p>This will display five videos about Alan Turing in the
+<p>This will display four videos about Alan Turing in the
 'playlist-container-1'; if you click on any of the videos the video will
 start playing in a new player instance created inside the 'player-container'.</p>
 
 <div id="example-2-container" class="example"></div>
 <div id="example-2" class="example"></div>
-<script>$('#example-2').tube({ player: 'example-2-container', autoload: true, query: 'alan turing', limit: 5 });</script>
+<script>$('#example-2').tube({ player: 'example-2-container', autoload: true, query: 'alan turing', limit: 4 });</script>
 
 <p>Next, you could add a second playlist whose videos will play back in
 the same player instance:</p>
@@ -142,15 +142,15 @@ the same player instance:</p>
 <pre><code>$('#playlist-container-2').tube({
   player: 'player-container',
   user: 'GoogleDevelopers',
-  limit: 5
+  limit: 4
 });
 </code></pre>
 
-<p>This will add the latest five videos uploaded by the user GoogleDevelopers.
+<p>This will add the latest two videos uploaded by the user GoogleDevelopers.
 In this way you can add multiple playlists that share a single video player.</p>
 
 <div id="example-3" class="example"></div>
-<script>$('#example-3').tube({ player: 'example-2-container', user: 'GoogleDevelopers', limit: 5 });</script>
+<script>$('#example-3').tube({ player: 'example-2-container', user: 'GoogleDevelopers', limit: 2 });</script>
 
 <p>You can also create arbitrary playlists on the fly by passing a list of
 YouTube IDs. The next example will reuse the same player again:</p>

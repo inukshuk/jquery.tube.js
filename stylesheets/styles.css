@@ -254,9 +254,12 @@ footer {
   }
 }
 
+p, pre, .example {
+	clear: left;
+}
+
 .example {
 	width: 500px;
-	clear: left;
 }
 
 .example ol {
@@ -266,10 +269,12 @@ footer {
 
 .example ol li {
 	display: block;
-	width: 250px;
+	width: 225px;
+	height: 350px;
+	margin-right: 5px;
 	float: left;
 }
 
-.example ol h1 {
+.example ol h1, .example ol a, .example ol .statistics {
 	font-size: 12px;
 }
