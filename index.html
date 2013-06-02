@@ -164,8 +164,11 @@ YouTube IDs. The next example will reuse the same player again:</p>
 <div id="example-4" class="example"></div>
 <script>$('#example-4').tube({ player: 'example-2-container', list: ['sOEAD-gfJ_M', 'u1zgFlCw8Aw'] });</script>
 
-<p>If you want to adapt the HTML of the generated tubes, you can do so by defining
-in a template configuration. The default configuration looks like this:</p>
+<p>As you can see the tube plugin generates simple playlists that are easy to style
+with custom CSS.
+If you want to adapt the HTML of the generated tubes, you can do so by defining it
+in a template configuration that you pass to the tube function.
+The default configuration looks like this:</p>
 
 <pre><code>templates = {
   thumbnail: '&lt;img src="{url}" title="{title}" /&gt;',
