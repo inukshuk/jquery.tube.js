@@ -265,11 +265,12 @@ p, pre, .example {
 .example ol {
 	list-style: none;
 	margin-left: 0;
+	padding-left: 5px;
 }
 
 .example ol li {
 	display: block;
-	width: 225px;
+	width: 245px;
 	height: 350px;
 	margin-right: 5px;
 	float: left;
