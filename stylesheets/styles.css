@@ -254,6 +254,10 @@ footer {
   }
 }
 
+.example {
+	clear: left;
+}
+
 .example ol {
 	list-style: none;
 	margin-left: 0;
