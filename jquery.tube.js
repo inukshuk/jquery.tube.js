@@ -1,5 +1,5 @@
 /*!
- * jquery.tube.js 0.2.5
+ * jquery.tube.js 0.2.6
  * Copyright (c) 2013 Sylvester Keil, Thomas Egger.
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a
@@ -907,7 +907,7 @@
   
   // TODO change switch to improve testability
   
-  if ($.isFunction(window.postMessage) && !$.browser.msie) {
+  if ($.isFunction(window.postMessage)) {
   
     // Use the iFrame API
     // https://code.google.com/apis/youtube/iframe_api_reference.html
@@ -1192,4 +1192,4 @@
   $.player = {};
   $.player.defaults = Player.defaults;
   $.player.counter = 0;
-}(jQuery, window, window.document, '0.2.5'));
+}(jQuery, window, window.document, '0.2.6'));
