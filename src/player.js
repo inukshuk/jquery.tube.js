@@ -202,7 +202,7 @@ Player.prototype.current_video = function (callback) {
 
 // TODO change switch to improve testability
 
-if ($.isFunction(window.postMessage) && !$.browser.msie) {
+if ($.isFunction(window.postMessage)) {
 
   // Use the iFrame API
   // https://code.google.com/apis/youtube/iframe_api_reference.html
