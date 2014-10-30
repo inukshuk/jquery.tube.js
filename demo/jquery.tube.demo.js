@@ -8,7 +8,7 @@
 	var start = function (event) {
 	  var player = this.p;
 
-	  setInterval(function () {
+	  timeout = setInterval(function () {
 	    console.log('curren time: ', player.getCurrentTime());
 	  }, 50);
 	};
