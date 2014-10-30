@@ -9,7 +9,7 @@
 	  var player = this.p;
 
 	  timeout = setInterval(function () {
-	    console.log('curren time: ', player.getCurrentTime());
+	    console.log('current time: ', player.getCurrentTime());
 	  }, 50);
 	};
 
