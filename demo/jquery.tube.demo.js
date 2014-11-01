@@ -8,8 +8,8 @@
 	var start = function (event) {
 	  var player = this.p;
 
-	  setInterval(function () {
-	    console.log('curren time: ', player.getCurrentTime());
+	  timeout = setInterval(function () {
+	    console.log('current time: ', player.getCurrentTime());
 	  }, 50);
 	};
 
