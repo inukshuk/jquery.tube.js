@@ -192,7 +192,7 @@ Player.prototype.current_video = function (callback) {
     return this.video;
   }
 
-  if ($.isFunction(callback)) {
+  if (typeof callback === 'function') {
     window.setTimeout(function () { callback.apply(video, [1, false, video]); }, 0);
   }
   return video;
@@ -202,7 +202,7 @@ Player.prototype.current_video = function (callback) {
 
 // TODO change switch to improve testability
 
-if ($.isFunction(window.postMessage)) {
+if (typeof window.postMessage === 'function') {
 
   // Use the iFrame API
   // https://code.google.com/apis/youtube/iframe_api_reference.html
@@ -220,7 +220,7 @@ if ($.isFunction(window.postMessage)) {
     if (typeof YT === 'undefined') {
       var tag = document.createElement('script');
 
-      if ($.isFunction(callback)) {
+      if (typeof callback === 'function') {
         Player.callbacks.push(callback);
       }
 
@@ -235,7 +235,7 @@ if ($.isFunction(window.postMessage)) {
       return false;
     }
 
-    if ($.isFunction(callback)) {
+    if (typeof callback === 'function') {
       setTimeout(callback, 0);
     }
 
@@ -310,7 +310,7 @@ else {
     if (typeof swfobject === 'undefined') {
 
       $.getScript(Player.constants.swfobject, function () {
-        if ($.isFunction(callback)) {
+        if (typeof callback === 'function') {
           callback.call();
         }
       });
@@ -319,7 +319,7 @@ else {
     }
 
     // Execute the callback (non-blocking)
-    if ($.isFunction(callback)) {
+    if (typeof callback === 'function') {
       setTimeout(callback, 0);
     }
 
