@@ -1,6 +1,6 @@
 /*!
  * jquery.tube.js 0.2.6
- * Copyright (c) 2013 Sylvester Keil, Thomas Egger.
+ * Copyright (c) 2014 Sylvester Keil, Thomas Egger.
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -897,7 +897,7 @@
       return this.video;
     }
   
-    if ($.isFunction(callback)) {
+    if (typeof callback === 'function') {
       window.setTimeout(function () { callback.apply(video, [1, false, video]); }, 0);
     }
     return video;
@@ -907,7 +907,7 @@
   
   // TODO change switch to improve testability
   
-  if ($.isFunction(window.postMessage)) {
+  if (typeof window.postMessage === 'function') {
   
     // Use the iFrame API
     // https://code.google.com/apis/youtube/iframe_api_reference.html
@@ -925,7 +925,7 @@
       if (typeof YT === 'undefined') {
         var tag = document.createElement('script');
   
-        if ($.isFunction(callback)) {
+        if (typeof callback === 'function') {
           Player.callbacks.push(callback);
         }
   
@@ -940,7 +940,7 @@
         return false;
       }
   
-      if ($.isFunction(callback)) {
+      if (typeof callback === 'function') {
         setTimeout(callback, 0);
       }
   
@@ -1015,7 +1015,7 @@
       if (typeof swfobject === 'undefined') {
   
         $.getScript(Player.constants.swfobject, function () {
-          if ($.isFunction(callback)) {
+          if (typeof callback === 'function') {
             callback.call();
           }
         });
@@ -1024,7 +1024,7 @@
       }
   
       // Execute the callback (non-blocking)
-      if ($.isFunction(callback)) {
+      if (typeof callback === 'function') {
         setTimeout(callback, 0);
       }
   

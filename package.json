@@ -25,7 +25,7 @@
 	  "test": "mocha test/runner.js"
 	},
 	"dependencies": {
-		"jquery": ">=1.7.1"
+		"jquery": "~2.1"
 	},
 	"devDependencies": {
 		"jsdom": "~0.2.19",
