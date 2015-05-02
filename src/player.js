@@ -270,7 +270,7 @@ if (typeof window.postMessage === 'function') {
   };
 
   // YouTube API's initial callback
-  window.onYouTubePlayerAPIReady = function () {
+  window.onYouTubeIframeAPIReady = function () {
     $.each(Player.callbacks, function () {
       this.call();
     });
